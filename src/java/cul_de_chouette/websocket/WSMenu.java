@@ -6,11 +6,12 @@
 package cul_de_chouette.websocket;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -18,6 +19,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import javax.xml.bind.DatatypeConverter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,14 +40,37 @@ public class WSMenu {
         System.out.println(pseudo);
         System.out.println(message);
         JSONObject object;
+        JSONArray content;
+        String gameId;
         try {
             object = (JSONObject) this.parser.parse(message);
+            content = (JSONArray) object.get("message");
         } catch (ParseException ex) {
             return WSMenu.createMessage(ex.toString(), "error");
         }
         
+        MessageDigest md;
         
-        return WSMenu.createMessage("Message invalide !", "error");
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException ex) {
+            return WSMenu.createMessage("Erreur de génération d'id de partie !", "error");
+        }
+        
+        // Génération d'un id preque unique
+        md.update((object.toJSONString() + pseudo + String.valueOf(Math.random())).getBytes()); 
+        byte[] digest = md.digest();
+        gameId = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        
+        content.forEach(user -> {
+            JSONObject contentUser = (JSONObject) user;
+            JSONObject sender = new JSONObject();
+            sender.put("id", gameId);
+            sender.put("pseudo", pseudo);
+            this.sendToUser(contentUser.get("pseudo").toString(), sender , "GAMEREQUEST");
+        });
+        
+        return WSMenu.createMessage(gameId, "ACK");
     }
     
     @OnOpen
@@ -100,10 +125,12 @@ public class WSMenu {
         this.broadcast(message, new String[0]);
     }
     
-    public void sensToUser(String user, String message) {
+    public void sendToUser(String user, Object message, String type) {
         WSMenu.listeWS.forEach(ws -> {
             try {
-                ws.getBasicRemote().sendText(message);
+                if(user.equals(ws.getPathParameters().get("pseudo"))) {
+                    ws.getBasicRemote().sendText(WSMenu.createMessage(message, type));
+                }
             }
             catch (IOException ex) {
                 System.err.println("Erreur de communication");

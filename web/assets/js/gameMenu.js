@@ -5,12 +5,17 @@ container.style.display = 'none';
 
 let websocket;
 
-document.querySelector('#register').addEventListener('click', () => {
-    const pseudo = document.querySelector('#pseudo');
+const pseudo = document.querySelector('#pseudo');
+
+/* TEMP */
+document.querySelector('#register').addEventListener('click', (e) => {
+    pseudo.style.display = 'none';
+    e.target.style.display = 'none';
     if(!pseudo.value) return;
     
     websocket = createWebSocket(`ws://localhost:8081/menu/${pseudo.value}`);
 });
+/* FIN TEMP */
 
 function createWebSocket(url) {
     const websocket = new WebSocket(url);
@@ -19,6 +24,12 @@ function createWebSocket(url) {
         console.log(evt);
         console.log('Connexion établie');
         container.style.display = 'block';
+        iziToast.info({
+            title: 'Info',
+            message: 'Connexion à la websocket établie !',
+            layout: 2,
+            theme: 'light'
+        });
     };
 
     websocket.onmessage = (evt) => {
@@ -27,6 +38,9 @@ function createWebSocket(url) {
         if(data['CONNECTEDPLAYERS']) initMenu(data['CONNECTEDPLAYERS']);
         else if(data['ADDTOLIST']) addPlayerToList(data['ADDTOLIST']);
         else if(data['REMOVEFROMLIST']) removePlayerFromList(data['REMOVEFROMLIST']);
+        else if(data['GAMEREQUEST']) gameRequest(data['GAMEREQUEST'].id, data['GAMEREQUEST'].pseudo);
+        else if(data['ACK']) redirect(data['ACK'], true);
+        else if(data['error']) handleWebSocketError(data);
     };
 
     websocket.onerror = (evt) => {
@@ -35,11 +49,18 @@ function createWebSocket(url) {
 
     websocket.onclose = (evt) => {
         handleWebSocketError(evt);
+        document.location.reload();
     };
 
-    function handleWebSocketError(event) {
+    function handleWebSocketError({ error }) {
         document.body.disabled = true;
-        console.error(event.error);
+        console.error(error);
+        iziToast.error({
+            title: 'Erreur',
+            message: error,
+            layout: 2,
+            theme: 'light'
+        });
     }
     
     return websocket;
@@ -102,15 +123,14 @@ function initMenu(players) {
             return;
         }
 
-        if(positions.findIndex(element => !element || element < 1 || element > positions.length) >= 0 || positions.length !== new Set(positions).size) {
+        if(positions.findIndex(element => !element || element <= 1 || element > positions.length + 1) >= 0 || positions.length !== new Set(positions).size) {
             console.log('Plusieurs personne possède le même ordre de jeu ou une personne n\'a pas d\'ordre définie !');
             return;
         }
 
         const selectedCheckbox = document.querySelectorAll('table tbody tr td input[type="checkbox"]:checked');
 
-        // Null sera ici le joueur courant
-        const users = [ null ];
+        const users = [];
         selectedCheckbox.forEach((checkbox, index) => {
             let user = {
                 pseudo: checkbox.value,
@@ -119,6 +139,66 @@ function initMenu(players) {
             users.push(user);
         });
 
+        // Je pense que ce serait plus simple de changer de page et apres lancer la game
+        // Comme ca on aurait deux connexion sur la seconde page une pour le retour d'info des demande accepter ou non
+        // et l'autre pour gérer la game en elle même avec les gens qui ont rejoint etc
+        // Sinon on garde cette logique et on attend juste que les gens rejoignent on aura pas de retour sur les refus
+        // Et genre on lance un timeout et si au bout de se timeout, il y toujours personne on redirige sur la page Menu (on annule la game)
+        // On mettra un ecran d'attente avec un bouton annulé la game (pour le leader) qui supprimera la room et redirigera tout le monde sur la page Menu
         console.log(users);
+        websocket.send(new Message(users));
     });
+}
+
+function gameRequest(id, player) {
+    console.log(id);
+    
+    // Demander si on veut join
+    // Si oui
+    iziToast.question({
+        timeout: 20000,
+        close: false,
+        overlay: true,
+        displayMode: 'once',
+        id: 'question',
+        zindex: 999,
+        title: `Demande de ${player} !`,
+        message: 'Voulez-vous le rejoindre ?',
+        position: 'center',
+        buttons: [
+            ['<button><b>Oui</b></button>', function (instance, toast, button, events, inputs) {
+                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');  
+                redirect(id);
+            }, true /* Focus on load ? */],
+            ['<button>Non</button>', function (instance, toast, button, events, inputs) {
+                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+            }]
+        ]
+    });
+    
+    // Sinon envoyer une info de refus ou on fait rien suivant le scénario choisi
+}
+
+function redirect(id, leader) {
+    console.log(`gameId : %c${id}`, 'color: blue; font-size: bold;');
+    if(leader) {
+        /**********************************************************/
+        /* TODO: Résoudre ce problème (communication inter pages) */
+        /**********************************************************/
+        
+        // Problème pour avoir les positions
+        // et toute les infos générale de la game
+
+        // ce qui peut etre possible ca serait de créer la connexion avec la websocket ici et apres on envoie les infos de la game comme ca on la crée avant de la join
+        // et comme pseudo on met rien
+        
+        // ou sinon on redirige en post puisqu'on a une page jsp quoi que vu que les jsp sont communes
+        // ça marchera pas je pense
+        // Le probleme c'est que si c'est commun comment dissocié et quoi qu'il arrive comment avoir les données
+        // Faut que je relise le cours sur les servelts et que je me renseigne
+        
+        //const WSInitGame = createWebSocket(`ws://localhost:8081/game//${id}`);
+    }
+    // Rediriger vers la bonne page
+    window.location.replace(`game.jsp?psedo=${pseudo.value}&id=${id}`);
 }
