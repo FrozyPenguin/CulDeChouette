@@ -38,8 +38,8 @@ function createWebSocket(url) {
         if(data['CONNECTEDPLAYERS']) initMenu(data['CONNECTEDPLAYERS']);
         else if(data['ADDTOLIST']) addPlayerToList(data['ADDTOLIST']);
         else if(data['REMOVEFROMLIST']) removePlayerFromList(data['REMOVEFROMLIST']);
-        else if(data['GAMEREQUEST']) gameRequest(data['GAMEREQUEST'].id, data['GAMEREQUEST'].pseudo);
-        else if(data['ACK']) redirect(data['ACK'], true);
+        else if(data['GAMEREQUEST']) gameRequest(data['GAMEREQUEST']);
+        else if(data['ACK']) redirect(data['ACK'].gameUrl);
         else if(data['error']) handleWebSocketError(data);
     };
 
@@ -150,25 +150,24 @@ function initMenu(players) {
     });
 }
 
-function gameRequest(id, player) {
-    console.log(id);
+function gameRequest(sender) {
+    console.log(sender);
     
     // Demander si on veut join
     // Si oui
     iziToast.question({
-        timeout: 20000,
         close: false,
         overlay: true,
         displayMode: 'once',
         id: 'question',
         zindex: 999,
-        title: `Demande de ${player} !`,
+        title: `Demande de ${sender.pseudo} !`,
         message: 'Voulez-vous le rejoindre ?',
         position: 'center',
         buttons: [
             ['<button><b>Oui</b></button>', function (instance, toast, button, events, inputs) {
                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');  
-                redirect(id);
+                redirect(sender.gameUrl);
             }, true /* Focus on load ? */],
             ['<button>Non</button>', function (instance, toast, button, events, inputs) {
                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
@@ -179,26 +178,8 @@ function gameRequest(id, player) {
     // Sinon envoyer une info de refus ou on fait rien suivant le scénario choisi
 }
 
-function redirect(id, leader) {
-    console.log(`gameId : %c${id}`, 'color: blue; font-size: bold;');
-    if(leader) {
-        /**********************************************************/
-        /* TODO: Résoudre ce problème (communication inter pages) */
-        /**********************************************************/
-        
-        // Problème pour avoir les positions
-        // et toute les infos générale de la game
-
-        // ce qui peut etre possible ca serait de créer la connexion avec la websocket ici et apres on envoie les infos de la game comme ca on la crée avant de la join
-        // et comme pseudo on met rien
-        
-        // ou sinon on redirige en post puisqu'on a une page jsp quoi que vu que les jsp sont communes
-        // ça marchera pas je pense
-        // Le probleme c'est que si c'est commun comment dissocié et quoi qu'il arrive comment avoir les données
-        // Faut que je relise le cours sur les servelts et que je me renseigne
-        
-        //const WSInitGame = createWebSocket(`ws://localhost:8081/game//${id}`);
-    }
+function redirect(url) {
+    console.log(`gameUrl : %c${url}`, 'color: blue; font-size: bold;');    
     // Rediriger vers la bonne page
-    window.location.replace(`game.jsp?psedo=${pseudo.value}&id=${id}`);
+    window.location.replace(url);
 }

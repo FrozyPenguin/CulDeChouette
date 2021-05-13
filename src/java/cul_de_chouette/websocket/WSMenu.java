@@ -6,10 +6,9 @@
 package cul_de_chouette.websocket;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -19,11 +18,9 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import javax.xml.bind.DatatypeConverter;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -33,7 +30,6 @@ import org.json.simple.parser.ParseException;
 public class WSMenu {
     // la liste des websockets : en static pour être partagée
     private static final ArrayList<Session> listeWS = new ArrayList<>();
-    JSONParser parser = new JSONParser();
     
     @OnMessage
     public String onMessage(@PathParam("pseudo")String pseudo, String message) {
@@ -43,34 +39,31 @@ public class WSMenu {
         JSONArray content;
         String gameId;
         try {
-            object = (JSONObject) this.parser.parse(message);
-            content = (JSONArray) object.get("message");
-        } catch (ParseException ex) {
+            object = new JSONObject(message);
+            content = object.getJSONArray("message");
+        } catch (JSONException ex) {
             return WSMenu.createMessage(ex.toString(), "error");
         }
         
-        MessageDigest md;
-        
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException ex) {
-            return WSMenu.createMessage("Erreur de génération d'id de partie !", "error");
-        }
-        
         // Génération d'un id preque unique
-        md.update((object.toJSONString() + pseudo + String.valueOf(Math.random())).getBytes()); 
-        byte[] digest = md.digest();
-        gameId = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        gameId = Base64.getEncoder().encodeToString((object.toString() + pseudo + String.valueOf(Math.random())).getBytes());
+        
+        JSONObject sender = new JSONObject();
+        sender.put("id", gameId);
+        sender.put("pseudo", pseudo);
         
         content.forEach(user -> {
             JSONObject contentUser = (JSONObject) user;
-            JSONObject sender = new JSONObject();
-            sender.put("id", gameId);
-            sender.put("pseudo", pseudo);
+            sender.put("role", "player");
+            sender.put("gameUrl", "game.jsp?pseudo=" + contentUser.getString("pseudo") + "&id=" + gameId);
             this.sendToUser(contentUser.get("pseudo").toString(), sender , "GAMEREQUEST");
         });
         
-        return WSMenu.createMessage(gameId, "ACK");
+        sender.put("role", "leader");
+        sender.put("users", content);        
+        sender.put("gameUrl", "game.jsp?pseudo=" + pseudo + "&id=" + gameId + "&game=" + Base64.getEncoder().encodeToString(sender.toString().getBytes()));
+        
+        return WSMenu.createMessage(sender, "ACK");
     }
     
     @OnOpen
@@ -79,7 +72,7 @@ public class WSMenu {
         // à l'ouverture d'une connexion, on rajoute la WS dans la liste
         JSONArray response = new JSONArray();
         WSMenu.listeWS.forEach(ws -> {
-            response.add(ws.getPathParameters().get("pseudo"));
+            response.put(ws.getPathParameters().get("pseudo"));
         });
         session.getBasicRemote().sendText(WSMenu.createMessage(response, "CONNECTEDPLAYERS"));
         
@@ -141,6 +134,6 @@ public class WSMenu {
     private static String createMessage(Object message, String type) {
         JSONObject response = new JSONObject();
         response.put(type, message);
-        return response.toJSONString();
+        return response.toString();
     }
 }
