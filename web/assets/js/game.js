@@ -10,10 +10,6 @@ console.log('ok');
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-console.log(urlParams);
-for (let [name, value] of urlParams) {
-  console.log(name, value);
-}
 
 if(!(urlParams.has('pseudo') && urlParams.get('id'))) {
     window.history.back();
@@ -32,6 +28,7 @@ if(urlParams.has('game')) {
 // Quand la websocket ferme, on fait un historyback
 
 const websocket = new WebSocket(websocketUrl);
+let currentUsers = [];
 
 websocket.onopen = (evt) => {
     console.log(evt);
@@ -48,8 +45,8 @@ websocket.onopen = (evt) => {
 websocket.onmessage = (evt) => {
     let data = JSON.parse(evt.data);
     console.log(`Message : %c${evt.data}`, 'color: orange; font-size: bold;');
-    if(data['CONNECTED']) connected(data['CONNECTED']);
-    else if(data['DISCONNECTED']) disconnected(data['DISCONNECTED']);
+    if(data['CONNECTED']) updateUserList(data['CONNECTED']);
+    else if(data['DISCONNECTED']) updateUserList(data['DISCONNECTED']);
     else if(data['error']) handleWebSocketError(data);
 };
 
@@ -84,10 +81,36 @@ function handleWebSocketError({ error }) {
     }, 5000);
 }
 
-function connected(pseudo) {
-    console.log(`%cUtilisateur ${pseudo} vient de se connecter !`, 'color: orange; font-weight: bold');
+const launchButton = document.querySelector("#loader #launchGame");
+if(launchButton) {
+    launchButton.addEventListener('click', (event) => {
+        websocket.send('start');
+    });
 }
 
-function disconnected(pseudo) {
-    console.log(`%cUtilisateur ${pseudo} vient de se déconnecter !`, 'color: red; font-weight: bold');
+function updateUserList(list) {
+    document.querySelector('#actualPlayers').innerHTML = list.connected.length;
+    document.querySelector('#totalPlayers').innerHTML = list.total;
+    currentUsers = list.connected;
+    
+    let users = new Array(list.total).fill('En attente');
+    
+    list.connected.forEach(user => {
+        users[user.position - 1] = user.pseudo;
+    });
+    
+    const documentList = document.querySelector('#onlinePlayersContainer .list');
+    documentList.innerHTML = "";
+    
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.innerHTML = user;
+        li.classList.add(user === 'En attente' ? 'disconnected' : 'connected');
+        documentList.appendChild(li);
+    });
+    
+    if(list.connected.length === list.total && list.connected[0].pseudo === urlParams.get('pseudo') && launchButton) {
+        launchButton.disabled = false;
+    }
+    else if(list.connected[0].pseudo === urlParams.get('pseudo') && launchButton) launchButton.disabled = true;
 }

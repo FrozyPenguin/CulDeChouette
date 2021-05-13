@@ -33,8 +33,19 @@ public class WSGame {
     private static final HashMap<String, Game> listeRoom = new HashMap<>();
     
     @OnMessage
-    public String onMessage(@PathParam("pseudo") String pseudo, @PathParam("id") String channel, String message) {    
-        return WSGame.createMessage("Nothing", "ACK");
+    public String onMessage(@PathParam("pseudo") String pseudo, @PathParam("id") String channel, String message) {
+        if(null != message) switch (message) {
+            case "start":
+                WSGame.listeRoom.get(channel).startGame();
+                break;
+            case "chouetteRoll":
+                return WSGame.createMessage(new Integer[]{Game.roll(), Game.roll()}, "chouetteResult");
+            case "culRoll":
+                return WSGame.createMessage(Game.roll(), "culResult");
+            default:
+                break;
+        }
+        return WSGame.createMessage("Ok", "ACK");
     }
     
     @OnOpen

@@ -18,19 +18,32 @@
     <body>
         <h1>Hello World!</h1>
         
-        <%
-            String decodedGameString = "Not a leader !";
-            String gameParam = request.getParameter("game");
-            if(gameParam != null) {
-                byte[] decodedGameBytes = Base64.getDecoder().decode(gameParam);
-                decodedGameString = new String(decodedGameBytes);
-            }
-        %>
-        
-        <p>
-            Parameters : <%= request.getParameterMap().toString() %>
-            Game Info : <%= decodedGameString %>
-        </p>
+        <div class="container">
+            <div class="row">
+                <div class="col-9">
+                    
+                </div>
+                <div class="col-3">
+                    <div id="onlinePlayersContainer">
+                        <p>Joueur en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
+                        <ol class="list">
+                            
+                        </ol>
+                    </div>
+                </div>
+                
+                <div id="loader">
+                <%
+                    String gameParam = request.getParameter("game");
+                    if(gameParam != null) {
+                %>
+                    <button id="launchGame" disabled>Lancer la partie</button>
+                <%
+                    }
+                %>
+                </div>
+            </div>
+        </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/js/iziToast.min.js"></script>
         <script src="assets/js/game.js" type="module"></script>

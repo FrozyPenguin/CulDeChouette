@@ -156,6 +156,7 @@ function gameRequest(sender) {
     // Demander si on veut join
     // Si oui
     iziToast.question({
+        timeout: false,
         close: false,
         overlay: true,
         displayMode: 'once',

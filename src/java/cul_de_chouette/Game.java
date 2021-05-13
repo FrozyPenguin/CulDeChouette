@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import org.json.JSONArray;
@@ -25,6 +28,7 @@ public class Game {
     // On associe une position à un pseudo
     private final HashMap<Integer, String> users = new HashMap<>();
     private String id = null;
+    private int turn = 0;
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.getString("id");
@@ -59,10 +63,39 @@ public class Game {
         // Faudra voir par rapport à la base qu'on a
     }
     
+    public String nextTurn() {
+        this.turn ++;
+        // retourne le joueur qui doit jouer
+        return "";
+    }
+    
+    public static Integer roll() {
+        Random rand = new Random();
+        return rand.nextInt((6 - 1) + 1) + 1;
+    }
+    
     public void addUser(Session session) throws GameException {
         if(this.users.containsValue(session.getPathParameters().get("pseudo"))) {
             this.listeWS.add(session);
-            this.broadcast(WSGame.createMessage((String) session.getPathParameters().get("pseudo"), "CONNECTED"), new String[]{session.getPathParameters().get("pseudo")});
+            
+            JSONArray connectedList = new JSONArray();
+            this.listeWS.forEach(user -> {
+                JSONObject userObject = new JSONObject();
+                userObject.put("pseudo", user.getPathParameters().get("pseudo"));
+                userObject.put("position", 
+                    this.users.keySet()
+                        .stream()
+                        .filter(key -> user.getPathParameters().get("pseudo").equals(this.users.get(key)))
+                        .findFirst().get()
+                );
+                connectedList.put(userObject);
+            });
+            
+            JSONObject connectedObject = new JSONObject();
+            connectedObject.put("connected", connectedList);
+            connectedObject.put("total", this.users.size());
+            
+            this.broadcast(WSGame.createMessage(connectedObject, "CONNECTED"), new String[0]);
         }
         else {
             throw new GameException("L'utilisateur n'est pas autorisé à rejoindre la salle de jeu.");
@@ -72,7 +105,24 @@ public class Game {
     public void removeUser(Session session, CloseReason reason) throws IOException {
         this.closeUserConnection(session, reason);
         this.listeWS.remove(session);
-        this.broadcast(WSGame.createMessage((String) session.getPathParameters().get("pseudo"), "DISCONNECTED"), new String[0]);
+        
+        JSONArray connectedList = new JSONArray();
+        this.listeWS.forEach(user -> {
+            JSONObject userObject = new JSONObject();
+            userObject.put("pseudo", user.getPathParameters().get("pseudo"));
+            userObject.put("position", 
+                this.users.keySet()
+                    .stream()
+                    .filter(key -> user.getPathParameters().get("pseudo").equals(this.users.get(key)))
+                    .findFirst().get()
+            );
+            connectedList.put(userObject);
+        });
+
+        JSONObject connectedObject = new JSONObject();
+        connectedObject.put("connected", connectedList);
+        connectedObject.put("total", this.users.size());
+        this.broadcast(WSGame.createMessage(connectedObject, "DISCONNECTED"), new String[0]);
     }
     
     public void closeUserConnection(Session session, CloseReason reason) throws IOException {
