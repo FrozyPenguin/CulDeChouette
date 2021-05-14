@@ -17,25 +17,26 @@
         <form id="form" style="font-family: Quicksand, sans-serif;background-color: rgba(44,40,52,0.73);width: 320px;padding: 32px;">
             <h1 id="head" style="color:rgb(193,166,83);">Inscription</h1>
             <div class="d-xl-flex justify-content-xl-center"><img class="rounded img-fluid" id="image" style="width:auto;height:auto;" src="assets/img/logo.png"></div>
-            <div class="form-group"><input class="form-control" type="email" id="formum" placeholder="Pseudonyme"></div>
-            <div class="form-group"><input class="form-control" type="password" id="formum2" placeholder="Mot de passe"></div>
-            <div class="form-group"><input class="form-control" type="number" id="formum2" placeholder="Age"></div>
+            <div class="form-group"><input class="form-control" type="text" id="formum" placeholder="Pseudonyme" required></div>
+            <div class="form-group"><input class="form-control" type="password" id="formum2" placeholder="Mot de passe" required></div>
+            <div class="form-group"><input class="form-control" type="number" id="formum2" placeholder="Age" required></div>
             <div class="form-group">
-                <select class="form-select" id="formum2" style="color: grey">
+                <select class="form-select" id="formum2" style="color: grey" required>
                     <option selected disabled hidden>Sexe</option>
                     <option value="H">Homme</option>
                     <option value="F">Femme</option>
                     <option value="A">Autre</option>
                   </select>
             </div>
-            <div class="form-group"><input class="form-control" type="text" id="formum2" placeholder="Ville"></div>
+            <div class="form-group"><input class="form-control" type="text" id="formum2" placeholder="Ville" required></div>
             <button class="btn btn-light" id="butonas" style="width: 100%;height: 100%;margin-bottom: 10px;background-color: rgb(221,172,24);color: rgb(255,255,255);font-size: 17px;"
-                type="button">Inscription</button>
+                type="submit">Inscription</button>
             <a id="linkas" style="font-size: 17px;margin: auto;margin-left: 0;margin-right: 0;margin-bottom: 0;margin-top: 0;padding-left: 0;padding-right: 0;color: rgb(177,151,70);" href="index.html">Je possède déja un compte.</a>
         </form>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/js/iziToast.min.js"></script>
+    <script src="assets/js/inscription.js"></script>
 </body>
 
 </html>
