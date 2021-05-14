@@ -8,8 +8,13 @@ function submitForm(event) {
     event.preventDefault(); 
     console.log("Envoi de l'inscription");
     
+    let pseudonyme = document.getElementById("pseudonyme").value();
+    let motDePasse = document.getElementById("motDePasse").value();
+    let age = document.getElementById("age").value();
+    let sexe = document.getElementById("sexe").value();
+    let ville = document.getElementById("ville").value();
     
-    
+    console.log({pseudonyme, motDePasse, age, sexe, ville});
 }
 
 const form = document.getElementById("form");
