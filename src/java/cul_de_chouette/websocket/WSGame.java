@@ -39,9 +39,12 @@ public class WSGame {
                 WSGame.listeRoom.get(channel).startGame();
                 break;
             case "chouetteRoll":
-                return WSGame.createMessage(new Integer[]{Game.roll(), Game.roll()}, "chouetteResult");
+                return WSGame.createMessage(new Integer[]{Game.roll(), Game.roll()}, "CHOUETTERESULT");
             case "culRoll":
-                return WSGame.createMessage(Game.roll(), "culResult");
+                return WSGame.createMessage(Game.roll(), "CULRESULT");
+            case "startCountdown":
+                WSGame.listeRoom.get(channel).broadcast("STARTCOUNTDOWN", new String[0]);
+                break;
             default:
                 break;
         }
@@ -76,6 +79,7 @@ public class WSGame {
                     try {
                         game = new Game(gameInfo);
                         game.addUser(session);
+                        game.sendToUser(pseudo, game.getReachPoint(), "REACH");
                     }
                     catch(GameException ex) {
                         session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Id invalide !"));
@@ -94,7 +98,9 @@ public class WSGame {
         // On est un simple joueur
         else {
             try {
-                WSGame.listeRoom.get(id).addUser(session);
+                Game game = WSGame.listeRoom.get(id);
+                game.addUser(session);
+                game.sendToUser(pseudo, game.getReachPoint(), "REACH");
             } catch (GameException|NullPointerException ex) {
                 System.out.println(ex);
                 session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Vous n'êtes pas autorisé à rejoindre la partie !"));

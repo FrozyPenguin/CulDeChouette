@@ -37,10 +37,12 @@ public class WSMenu {
         System.out.println(message);
         JSONObject object;
         JSONArray content;
+        String reachPoint;
         String gameId;
         try {
-            object = new JSONObject(message);
-            content = object.getJSONArray("message");
+            object = new JSONObject(message).getJSONObject("message");
+            content = object.getJSONArray("users");
+            reachPoint = object.getString("reachPoint");
         } catch (JSONException ex) {
             return WSMenu.createMessage(ex.toString(), "error");
         }
@@ -51,6 +53,7 @@ public class WSMenu {
         JSONObject sender = new JSONObject();
         sender.put("id", gameId);
         sender.put("pseudo", pseudo);
+        sender.put("reachPoint", reachPoint);
         
         content.forEach(user -> {
             JSONObject contentUser = (JSONObject) user;

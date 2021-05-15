@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import org.json.JSONArray;
@@ -28,13 +26,18 @@ public class Game {
     // On associe une position à un pseudo
     private final HashMap<Integer, String> users = new HashMap<>();
     private String id = null;
+    private int reachPoint = 343;
     private int turn = 0;
     
     public Game(JSONObject gameInfo) throws GameException {
-        this.id = gameInfo.getString("id");
+        this.id = gameInfo.optString("id");
         if(this.id == null) throw new GameException("Id vide !");
         
-        if(gameInfo.getString("pseudo") == null || gameInfo.getJSONArray("users").isEmpty()) {
+        if(gameInfo.optInt("reachPoint") > 0 && gameInfo.optInt("reachPoint") <= 343) {
+            this.reachPoint = gameInfo.getInt("reachPoint");
+        }
+        
+        if(gameInfo.optString("pseudo") == null || gameInfo.optJSONArray("users") == null || gameInfo.optJSONArray("users").isEmpty()) {
             throw new GameException("Information de partie invalide !");
         }
         
@@ -61,6 +64,8 @@ public class Game {
         // A chaque tour, on enregistre les résultats de dès des joueurs en base
         // Comme ça à la fin d'une partie, on a tous enregistré et on a juste à élire le vainqueur
         // Faudra voir par rapport à la base qu'on a
+        System.out.println("Début de la partie !");
+        this.broadcast(WSGame.createMessage("empty", "START"), new String[0]);
     }
     
     public String nextTurn() {
@@ -187,5 +192,9 @@ public class Game {
     
     public ArrayList<Session> getUsersWS() {
         return this.listeWS;
+    }
+    
+    public int getReachPoint() {
+        return this.reachPoint;
     }
 }

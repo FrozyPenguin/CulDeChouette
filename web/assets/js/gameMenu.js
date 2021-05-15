@@ -35,12 +35,12 @@ function createWebSocket(url) {
     websocket.onmessage = (evt) => {
         let data = JSON.parse(evt.data);
         console.log(`Message : %c${evt.data}`, 'color: orange; font-size: bold;');
-        if(data['CONNECTEDPLAYERS']) initMenu(data['CONNECTEDPLAYERS']);
-        else if(data['ADDTOLIST']) addPlayerToList(data['ADDTOLIST']);
-        else if(data['REMOVEFROMLIST']) removePlayerFromList(data['REMOVEFROMLIST']);
-        else if(data['GAMEREQUEST']) gameRequest(data['GAMEREQUEST']);
-        else if(data['ACK']) redirect(data['ACK'].gameUrl);
-        else if(data['error']) handleWebSocketError(data);
+        if('CONNECTEDPLAYERS' in data) initMenu(data['CONNECTEDPLAYERS']);
+        else if('ADDTOLIST' in data) addPlayerToList(data['ADDTOLIST']);
+        else if('REMOVEFROMLIST' in data) removePlayerFromList(data['REMOVEFROMLIST']);
+        else if('GAMEREQUEST' in data) gameRequest(data['GAMEREQUEST']);
+        else if('ACK' in data) redirect(data['ACK'].gameUrl);
+        else if('error' in data) handleWebSocketError(data);
     };
 
     websocket.onerror = (evt) => {
@@ -119,16 +119,36 @@ function initMenu(players) {
         const positions = Array.from(document.querySelectorAll('table tbody tr td input[type="number"]:not([disabled])')).map(element => element.value);
 
         if(!positions.length) {
-            console.log('Vous devez d\'abord sélectionner d\'autre participants');
+            iziToast.error({
+                title: 'Erreur',
+                message: 'Vous devez d\'abord sélectionner d\'autre participants',
+                layout: 2,
+                theme: 'light'
+            });
             return;
         }
 
         if(positions.findIndex(element => !element || element <= 1 || element > positions.length + 1) >= 0 || positions.length !== new Set(positions).size) {
-            console.log('Plusieurs personne possède le même ordre de jeu ou une personne n\'a pas d\'ordre définie !');
+            iziToast.error({
+                title: 'Erreur',
+                message: 'Plusieurs personne possède le même ordre de jeu ou une personne n\'a pas d\'ordre définie !',
+                layout: 2,
+                theme: 'light'
+            });
             return;
         }
 
         const selectedCheckbox = document.querySelectorAll('table tbody tr td input[type="checkbox"]:checked');
+        
+        if(selectedCheckbox.length > 5) {
+            iziToast.error({
+                title: 'Erreur',
+                message: 'Le nombre maximum de joueur est de 6 !',
+                layout: 2,
+                theme: 'light'
+            });
+            return;
+        }
 
         const users = [];
         selectedCheckbox.forEach((checkbox, index) => {
@@ -138,6 +158,11 @@ function initMenu(players) {
             };
             users.push(user);
         });
+        
+        const game = {
+            users,
+            reachPoint: document.querySelector('#gamePoint').value
+        };
 
         // Je pense que ce serait plus simple de changer de page et apres lancer la game
         // Comme ca on aurait deux connexion sur la seconde page une pour le retour d'info des demande accepter ou non
@@ -146,7 +171,7 @@ function initMenu(players) {
         // Et genre on lance un timeout et si au bout de se timeout, il y toujours personne on redirige sur la page Menu (on annule la game)
         // On mettra un ecran d'attente avec un bouton annulé la game (pour le leader) qui supprimera la room et redirigera tout le monde sur la page Menu
         console.log(users);
-        websocket.send(new Message(users));
+        websocket.send(new Message(game));
     });
 }
 

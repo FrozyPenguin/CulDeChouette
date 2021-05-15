@@ -15,16 +15,15 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/css/iziToast.min.css"/>
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
-    <body>
-        <h1>Hello World!</h1>
-        
+    <body>        
         <div class="container">
             <div class="row">
-                <div class="col-9">
+                <div class="col-9" id="actions">
                     
                 </div>
                 <div class="col-3">
                     <div id="onlinePlayersContainer">
+                        <p>Point à atteindre : <span id="reachPoint">343</span></p>
                         <p>Joueur en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
                         <ol class="list">
                             
@@ -37,7 +36,7 @@
                     String gameParam = request.getParameter("game");
                     if(gameParam != null) {
                 %>
-                    <button id="launchGame" disabled>Lancer la partie</button>
+                    <button class="btn btn-primary text-center w-100" id="launchGame" disabled>Lancer la partie</button>
                 <%
                     }
                 %>

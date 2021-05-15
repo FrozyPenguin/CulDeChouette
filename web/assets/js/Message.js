@@ -8,7 +8,7 @@ export class Message {
     }
     
     toString() {
-        console.log(this.message)
+        console.log(this.message);
         return JSON.stringify(this.message);
     }
 }
