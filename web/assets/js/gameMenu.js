@@ -1,21 +1,11 @@
 import { Message } from './Message.js';
 
-const container = document.querySelector('.container');
-container.style.display = 'none';
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+if(!urlParams.has('pseudo') || !urlParams.get('pseudo')) window.history.back();
+const pseudo = urlParams.get('pseudo');
 
-let websocket;
-
-const pseudo = document.querySelector('#pseudo');
-
-/* TEMP */
-document.querySelector('#register').addEventListener('click', (e) => {
-    pseudo.style.display = 'none';
-    e.target.style.display = 'none';
-    if(!pseudo.value) return;
-    
-    websocket = createWebSocket(`ws://localhost:8081/menu/${pseudo.value}`);
-});
-/* FIN TEMP */
+let websocket = createWebSocket(`ws://localhost:8081/menu/${pseudo}`);
 
 function createWebSocket(url) {
     const websocket = new WebSocket(url);
@@ -23,7 +13,6 @@ function createWebSocket(url) {
     websocket.onopen = (evt) => {
         console.log(evt);
         console.log('Connexion établie');
-        container.style.display = 'block';
         iziToast.info({
             title: 'Info',
             message: 'Connexion à la websocket établie !',
@@ -86,7 +75,7 @@ function addPlayerToList(player) {
     check.classList.add('text-center');
     check.innerHTML = `
         <td class="text-center">
-            <input type="checkbox" value="${player}">
+            <input type="checkbox" class="formum" value="${player}">
         </td>`;
     
     check.querySelector('input[type="checkbox"').addEventListener('click', function(event) {

@@ -13,6 +13,8 @@
         <title>JSP Page</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/css/iziToast.min.css"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
+        <link rel="stylesheet" href="assets/css/OcOrato---Login-form.css">
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
     <body>        

@@ -26,8 +26,8 @@ import org.json.JSONObject;
  *
  * @author frozy
  */
-@WebServlet(name = "updateServlet", urlPatterns = {"/updateServlet"})
-public class UpdateServlet extends HttpServlet {
+@WebServlet(name = "connectionServlet", urlPatterns = {"/connectionServlet"})
+public class ConnectionServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -52,28 +52,7 @@ public class UpdateServlet extends HttpServlet {
 
             trans = em.getTransaction();
             
-            String pseudo = (String) session.getAttribute("pseudo");
-            
-            if(pseudo == null) {
-                response.setStatus(500);
-                JSONObject error = new JSONObject();
-                error.put("status", "500");
-                error.put("error", "Session invalide !");
-                out.print(error.toString());
-                return;
-            }
-
-            Joueur joueur = em.find(Joueur.class, pseudo);
-
-            if(joueur == null) {
-                response.setStatus(404);
-                JSONObject error = new JSONObject();
-                error.put("status", "500");
-                error.put("error", "Le joueur n'existe pas !");
-                out.print(error.toString());
-                return;
-            }
-            
+            String pseudonyme = request.getParameter("pseudonyme");
             String mail = request.getParameter("mail");
             String mdp = request.getParameter("motDePasse");
             String naiss = request.getParameter("naiss");
@@ -81,8 +60,8 @@ public class UpdateServlet extends HttpServlet {
             String ville = request.getParameter("ville");
             
             if(
-                mail == null || mdp == null || naiss == null || sexe == null || ville == null ||
-                "".equals(mail) || "".equals(mdp) || "".equals(naiss) || "".equals(sexe) || "".equals(ville)
+                mail == null || mdp == null || naiss == null || sexe == null || ville == null || pseudonyme == null ||
+                "".equals(mail) || "".equals(mdp) || "".equals(naiss) || "".equals(sexe) || "".equals(ville) || "".equals(pseudonyme)
             ) {
                 response.setStatus(500);
                 JSONObject error = new JSONObject();
@@ -95,6 +74,8 @@ public class UpdateServlet extends HttpServlet {
             try {
                 trans.begin();
 
+                Joueur joueur = new Joueur();
+                joueur.setPseudonyme(pseudonyme);
                 joueur.setEmail(mail);
                 joueur.setMotDePasse(mdp);
                 joueur.setVille(ville);
@@ -105,6 +86,8 @@ public class UpdateServlet extends HttpServlet {
                 //convert String to LocalDate
                 LocalDate dateNaiss = LocalDate.parse(naiss, formatter);
                 joueur.setDateNaissance(dateNaiss);
+                
+                em.persist(joueur);
 
                 trans.commit();
             }
@@ -119,6 +102,8 @@ public class UpdateServlet extends HttpServlet {
                 return;
             }
             
+            session.setAttribute("pseudo", pseudonyme);
+            
             response.setStatus(200);
             JSONObject error = new JSONObject();
             error.put("status", "200");
@@ -127,7 +112,6 @@ public class UpdateServlet extends HttpServlet {
             
             em.close();
         }
-        
     }
 
     /**

@@ -7,6 +7,8 @@
     <title>selectPage</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/css/iziToast.min.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
+    <link rel="stylesheet" href="assets/css/OcOrato---Login-form.css">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
@@ -23,10 +25,8 @@
         }
         else {
     %>
-    
-        <input type="text" id="pseudo" />
-        <button id="register">Register</button>
         <div class="container">
+            <a class="linkas" href="update.jsp" id="update">Mettre à jour ses informations</a>
             <h1 class="text-center">Avec qui voulez-vous jouer ?</h1>
             <div class="table-responsive">
                 <table class="table table-striped table-hover table-bordered">
@@ -41,8 +41,8 @@
                     </tbody>
                 </table>
             </div>
-            <input class="form-control w-100 pb-2" type="number" id="gamePoint" min="0" max="343" value="343" />
-            <button class="btn btn-primary text-center w-100" id="gameBegin" type="button">Commencer une partie</button>
+            <input class="form-control w-100 pb-2 formum" type="number" id="gamePoint" min="0" max="343" value="343" />
+            <button class="btn btn-primary text-center w-100 butonas" id="gameBegin" type="button">Commencer une partie</button>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/js/iziToast.min.js"></script>
