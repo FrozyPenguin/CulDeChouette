@@ -17,14 +17,14 @@
         <link rel="stylesheet" href="assets/css/OcOrato---Login-form.css">
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
-    <body>        
+    <body class="container-image" style="padding-top: 20px;">        
         <div class="container"> 
             <%
                 String pseudo = (String) session.getAttribute("pseudo");
                 String pseudoReq = request.getParameter("pseudo");
                 if(pseudo == null || pseudoReq == null || pseudo != pseudoReq) {
             %>
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger" role="alert" id="alert">
                     Vous n'êtes pas connecté !
                 </div>
             <%
