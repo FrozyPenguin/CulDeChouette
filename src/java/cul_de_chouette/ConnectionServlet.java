@@ -27,7 +27,7 @@ import org.json.JSONObject;
  *
  * @author frozy
  */
-@WebServlet(name = "connectionServlet", urlPatterns = {"/connectionServlet"})
+@WebServlet(name = "ConnectionServlet", urlPatterns = {"/ConnectionServlet"})
 public class ConnectionServlet extends HttpServlet {
 
     /**
