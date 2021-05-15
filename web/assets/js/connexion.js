@@ -4,27 +4,23 @@
  * and open the template in the editor.
  */
 
-const servletUrl = "InscriptionServlet";
-const redirectionUrl = "index.html";
+const servletUrl = "ConnectionServlet";
+const redirectionUrl = "gameMenu.jsp?pseudo=";
 
 function submitForm(event) {
     event.preventDefault(); 
     
     let pseudonyme = document.getElementById('pseudonyme').value;
-    let email = document.getElementById('email').value;
     let motDePasse = document.getElementById("motDePasse").value;
-    let dateNaissance = document.getElementById("naiss").value;
-    let sexe = document.getElementById("sexe").value;
-    let ville = document.getElementById("ville").value;
     
-    let infosJoueur = {pseudonyme, email, motDePasse, dateNaissance, sexe, ville};
+    let infosJoueur = {pseudonyme, motDePasse};
     
     let urlEncodedDataPairs = [], name;
     for(name in infosJoueur) {
         urlEncodedDataPairs.push(`${name}=${infosJoueur[name]}`);
     }
     
-    console.log("Envoi de la demande d'inscription");
+    console.log("Envoi de la demande de connexion");
     requete = new XMLHttpRequest();
     requete.onreadystatechange = majPage;
     requete.open("POST", servletUrl);
@@ -37,20 +33,23 @@ function majPage () {
         console.log(requete.responseText);
         if (requete.status === 200) {
             iziToast.success({
-            title: 'Inscription terminée !',
+            title: 'Connexion réussie !',
             message: 'Vous allez être redirigé.',
             position: 'center',
             transitionIn: 'fadeIn',
+            timeout: 1000,
+            pauseOnHover: false,
             onClosed: function(instance, toast, closedBy){
-                window.location.href = redirectionUrl;
+                window.location.href = redirectionUrl + document.getElementById('pseudonyme').value;
                 }
             });
         } else {
             iziToast.error({
             title: 'Oops !',
-            message: 'Une erreur est survenue.',
+            message: 'Vos identifiants sont incorrects.',
             position: 'center',
-            transitionIn: 'fadeIn'
+            transitionIn: 'fadeIn',
+            pauseOnHover: false
             });
         }
     } 
