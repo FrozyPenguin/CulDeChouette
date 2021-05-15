@@ -6,6 +6,9 @@
 package cul_de_chouette;
 
 import cul_de_chouette.pojo.Action;
+import cul_de_chouette.pojo.ActionPK;
+import cul_de_chouette.pojo.Interraction;
+import cul_de_chouette.pojo.InterractionPK;
 import cul_de_chouette.pojo.Joueur;
 import cul_de_chouette.pojo.Partie;
 import cul_de_chouette.pojo.Resultats;
@@ -34,7 +37,7 @@ import org.json.JSONObject;
 public class Game {
     private final ArrayList<Session> listeWS = new ArrayList<>();
     // On associe une position à un pseudo
-    private final HashMap<Integer, String> users = new HashMap<>();
+    private final HashMap<Integer, Joueur> users = new HashMap<>();
     private String id = null;
     private int reachPoint = 343;
     private int turn = 0;
@@ -44,6 +47,7 @@ public class Game {
     private Partie partie;
     private Collection<Action> actions;
     private Collection<Resultats> resultats;
+    private double pendingPoints;
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.optString("id");
@@ -57,7 +61,7 @@ public class Game {
             throw new GameException("Information de partie invalide !");
         }
         
-        this.users.put(1, gameInfo.getString("pseudo"));
+        this.users.put(1, this.em.find(Joueur.class, gameInfo.getString("pseudo")));
         
         JSONArray gameInfoUsers = gameInfo.getJSONArray("users");
         for(Object userObject : gameInfoUsers) {
@@ -66,7 +70,7 @@ public class Game {
                 throw new GameException("Informations sur les joueurs invalide !");
             }
             
-            this.users.put(user.getInt("position"), user.getString("pseudo"));
+            this.users.put(user.getInt("position"), this.em.find(Joueur.class, user.getString("pseudo")));
         }
         
         // Affiche ce que contient la hashmap
@@ -92,6 +96,7 @@ public class Game {
             this.partie.setHote(hote);
             this.partie.setDateDebut(new Date());
             this.partie.setObjectif(this.reachPoint);
+            // TODO ajouter les joueurs
             
             em.persist(this.partie);
             em.flush();
@@ -106,17 +111,121 @@ public class Game {
         
         System.out.println("Début de la partie !");
         this.broadcast(WSGame.createMessage("empty", "START"), new String[0]);
+        this.nextTurn();
     }
     
-    public String nextTurn() {
-        this.turn ++;
+    public void endGame() {
+        // Faudra créer les resultats
+        // Pour obtenir le nombre de chouette velu perdu il faut juste regarder dans les actions les effets négatif et compter le nombre d'apparition du joueur
+        // Pour les suites c'est la même chose mais en comptant les effets positifs
+        // Pour le score final, on additionne les scores du joueur à chaque tour
+        
+        // Enregistrement des resultats et des actions en base
+        this.trans.begin();
+        this.partie.setActionCollection(this.actions);
+        this.partie.setResultatsCollection(this.resultats);
+        this.trans.commit();
+    }
+    
+    public void nextTurn() {
         // retourne le joueur qui doit jouer
-        return "";
+        this.turn ++;
+        
+        this.broadcast(WSGame.createMessage(this.getUserTurn(), "TURN"), new String[0]);
     }
     
     public static Integer roll() {
         Random rand = new Random();
         return rand.nextInt((6 - 1) + 1) + 1;
+    }
+    
+    public void executeTurn() {
+        this.pendingPoints = 0;
+        JSONObject dice = new JSONObject();
+        
+        JSONArray chouette = new JSONArray(new Integer[]{Game.roll(), Game.roll()});
+        
+        dice.put("chouette", chouette);
+        dice.put("cul", Game.roll());
+        dice.put("pseudo", this.getUserTurn());
+        
+        this.broadcast(WSGame.createMessage(dice, "ROLL"), new String[0]);
+        
+        this.processDice(dice);
+    }
+    
+    private void processDice(JSONObject dice) {        
+        int chouette1 = dice.getJSONArray("chouette").getInt(0);
+        int chouette2 = dice.getJSONArray("chouette").getInt(1);
+        int cul = dice.getInt("cul");
+        
+        Action action = new Action();
+        action.setPartie(this.partie);
+        action.setChouette1((short)chouette1);
+        action.setChouette2((short)chouette2);
+        action.setCul((short)cul);
+        // Il manque les points peut etre non ?
+        
+        ActionPK pk = new ActionPK();
+        pk.setIdPartie(this.partie.getIdPartie());
+        pk.setTour(this.turn);
+        
+        action.setActionPK(pk);
+        
+        JSONObject result = new JSONObject();
+        result.put("pseudo", dice.getString("pseudo"));
+        
+        if(cul == chouette1 + chouette2 && cul != chouette1) {
+            result.put("action", "Velute");
+            result.put("points", Math.pow(cul, 2));
+        }
+        else if(chouette1 == chouette2 && chouette2 != cul) {
+            result.put("action", "Chouette");
+            result.put("points", Math.pow(chouette1, 2));
+        }
+        else if(chouette1 == chouette2 && chouette2 == cul) {
+            result.put("action", "Cul de chouette");
+            result.put("points", 40 + chouette1 * 10);
+        }
+        else if(chouette1 == chouette2 && chouette1 + chouette2 == cul) {
+            result.put("action", "Chouette velute");
+            result.put("interact", "Pas mou le caillou !");
+            this.pendingPoints = Math.pow(cul, 2);
+        }
+        else {
+            int resultArray[] = {chouette1, chouette2, cul};
+            Arrays.sort(resultArray);
+            
+            if(resultArray[0] + 1 == resultArray[1] && resultArray[1] + 1 == resultArray[2]) {
+                result.put("action", "Suite");
+                result.put("interact", "Grelotte ça picote !");
+            }
+            
+            // TODO: A vérifier
+            // Je crois que c'est ça
+            result.put("points", chouette1 + chouette2 + cul);
+        }
+        
+        this.actions.add(action);
+        
+        this.broadcast(WSGame.createMessage(result, "RESULT"), new String[0]);
+    }
+    
+    public void handleInteraction(String joueur, String interaction) {
+        // Gérer l'ordre d'arrivé et agir en conséquence
+        
+        // TODO: Construire l'interraction
+        Interraction interraction = new Interraction();
+        
+        InterractionPK interractionPK = new InterractionPK();
+        interractionPK.setIdPartie(this.partie.getIdPartie());
+        interractionPK.setTour(this.turn);
+        
+        interraction.setEffet('P'); // Ou 'N' pour négatif
+        interraction.setInterractionPK(interractionPK);
+        // interraction.setJoueurAffecte(joueurAffecte);
+        // Ajout de l'interraction à la dernière actions enregistré dans la partie
+        this.actions.toArray(new Action[0])[this.actions.size() - 1].setInterraction(interraction);
     }
     
     public void addUser(Session session) throws GameException {
@@ -187,7 +296,7 @@ public class Game {
     }
     
     public String getLeader() {
-        return this.users.get(1);
+        return this.users.get(1).getPseudonyme();
     }
     
     public String getId() {
@@ -198,11 +307,11 @@ public class Game {
         return this.listeWS.stream().filter(ws -> pseudo.equals(ws.getPathParameters().get("pseudo"))).findFirst().orElse(null);
     }
     
-    public void sendToUser(String pseudo, Object message, String type) {
+    public void sendToUser(String pseudo, String message) {
         this.listeWS.forEach(ws -> {
             try {
                 if(pseudo.equals(ws.getPathParameters().get("pseudo"))) {
-                    ws.getBasicRemote().sendText(WSGame.createMessage(message, type));
+                    ws.getBasicRemote().sendText(message);
                 }
             }
             catch (IOException ex) {
@@ -227,11 +336,19 @@ public class Game {
     }
     
     public String getUserAtPos(int pos) {
-        return this.users.size() > pos ? this.users.get(pos) : "";
+        return this.users.size() > pos ? this.users.get(pos).getPseudonyme() : "";
     }
     
     public ArrayList<Session> getUsersWS() {
         return this.listeWS;
+    }
+    
+    public String getUserTurn() {
+        return this.getUserAtPos(((this.turn - 1) % this.users.size()) + 1);
+    }
+    
+    public int getTurn() {
+        return this.turn;
     }
     
     public int getReachPoint() {

@@ -29,6 +29,15 @@
 
     const websocket = new WebSocket(websocketUrl);
     let currentUsers = [];
+    const playerPseudo = urlParams.get('pseudo');
+    
+    // Boutons
+    const lancerDesButton = document.querySelector('#lancerDes');
+    const suiteButton = document.querySelector('#suite');
+    const chouetteVelueButton = document.querySelector('#chouetteVelue');
+    
+    // Liste des joueurs
+    const documentList = document.querySelector('#onlinePlayersContainer .list');
 
     websocket.onopen = (evt) => {
         console.log(evt);
@@ -41,7 +50,7 @@
             theme: 'light'
         });
 
-        if(launchButton) createAction(`La partie vient d'être créée par ${urlParams.get('pseudo')}.`, 'color: green');
+        if(launchButton) createAction(`La partie vient d'être créée par ${playerPseudo}.`, 'color: green');
     };
 
     websocket.onmessage = (evt) => {
@@ -63,6 +72,9 @@
             else if('error' in data) handleWebSocketError(data);
             else if('REACH' in data) setReachPoint(data['REACH']);
             else if('START' in data) startGame(data['START']);
+            else if('TURN' in data) playerTurn(data['TURN']);
+            else if('ROLL' in data) showDice(data['ROLL']);
+            else if('RESULT' in data) processResults(data['RESULT']);
         }
     };
 
@@ -135,7 +147,6 @@
             users[user.position - 1] = user.pseudo;
         });
 
-        const documentList = document.querySelector('#onlinePlayersContainer .list');
         documentList.innerHTML = "";
 
         users.forEach(user => {
@@ -145,10 +156,10 @@
             documentList.appendChild(li);
         });
 
-        if(list.connected.length === list.total && list.connected[0].pseudo === urlParams.get('pseudo') && launchButton) {
+        if(list.connected.length === list.total && list.connected[0].pseudo === playerPseudo && launchButton) {
             launchButton.disabled = false;
         }
-        else if(list.connected[0].pseudo === urlParams.get('pseudo') && launchButton) launchButton.disabled = true;
+        else if(list.connected[0].pseudo === playerPseudo && launchButton) launchButton.disabled = true;
     }
 
     function setReachPoint(point) {
@@ -156,12 +167,17 @@
         createAction(`Score de fin de partie défini sur ${point} points.`, 'color: orange; font-weight: bold;');
     }
 
-    function createAction(action, css) {
+    function createAction(actions, css) {
         let actionsBox = document.querySelector('#actions');
-        let p = document.createElement('p');
-        p.innerHTML = action;
-        if(css) p.setAttribute('style', css);
-        actionsBox.appendChild(p);
+        if(actions instanceof Array) actions.forEach(action => singleLine(action));
+        else singleLine(actions);
+        
+        function singleLine(action) {
+            let p = document.createElement('p');
+            p.innerHTML = action;
+            if(css) p.setAttribute('style', css);
+            actionsBox.appendChild(p);
+        }
 
         actionsBox.scrollTop = actionsBox.scrollHeight;
     }
@@ -183,5 +199,31 @@
     function startGame(startObj) {
         console.log('start');
         createAction(`La partie commence ! Préparez-vous !`, 'color: black; font-weight: bold; font-size: 1.5em;');
+    }
+    
+    function playerTurn(player) {
+        if(player === playerPseudo) createAction(`C'est à vous de jouer !`, 'color: orange');
+        else createAction(`${player} est en train de jouer !`);
+        
+        documentList.querySelectorAll('li').forEach(element => {
+            element.classList.remove('actualTurn');            
+        });
+        
+        const pos = currentUsers.filter(user => user.pseudo === player).position;
+        documentList.querySelector(`li:nth-of-type(${pos})`).classList.add('actualTurn');
+    }
+    
+    lancerDesButton.addEventListener('click', (event) => {
+        websocket.send('ROLL');
+    });
+    
+    function showDice(results) {
+        if(results.pseudo === playerPseudo) {
+            createAction([`${results.pseudo} à obtenu les dès :`, `- Chouette : ${results.chouette[0]} et ${results.chouette[1]}`, `- Cul ${results.cul}`]);
+        }
+    }
+    
+    function processResults(results) {
+        
     }
 })();

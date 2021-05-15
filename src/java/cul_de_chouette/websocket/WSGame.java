@@ -38,10 +38,9 @@ public class WSGame {
             case "start":
                 WSGame.listeRoom.get(channel).startGame();
                 break;
-            case "chouetteRoll":
-                return WSGame.createMessage(new Integer[]{Game.roll(), Game.roll()}, "CHOUETTERESULT");
-            case "culRoll":
-                return WSGame.createMessage(Game.roll(), "CULRESULT");
+            case "ROLL":
+                WSGame.listeRoom.get(channel).executeTurn();
+                break;
             case "startCountdown":
                 WSGame.listeRoom.get(channel).broadcast("STARTCOUNTDOWN", new String[0]);
                 break;
@@ -79,7 +78,7 @@ public class WSGame {
                     try {
                         game = new Game(gameInfo);
                         game.addUser(session);
-                        game.sendToUser(pseudo, game.getReachPoint(), "REACH");
+                        game.sendToUser(pseudo, WSGame.createMessage(game.getReachPoint(), "REACH"));
                     }
                     catch(GameException ex) {
                         session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Id invalide !"));
@@ -100,7 +99,7 @@ public class WSGame {
             try {
                 Game game = WSGame.listeRoom.get(id);
                 game.addUser(session);
-                game.sendToUser(pseudo, game.getReachPoint(), "REACH");
+                game.sendToUser(pseudo, WSGame.createMessage(game.getReachPoint(), "REACH"));
             } catch (GameException|NullPointerException ex) {
                 System.out.println(ex);
                 session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Vous n'êtes pas autorisé à rejoindre la partie !"));
@@ -164,8 +163,8 @@ public class WSGame {
         WSGame.listeRoom.get(channel).broadcast(message, new String[0]);
     }
     
-    public void sendToUser(String channel, String user, String message, String type) {
-        WSGame.listeRoom.get(channel).sendToUser(user, message, type);
+    public void sendToUser(String channel, String user, String message) {
+        WSGame.listeRoom.get(channel).sendToUser(user, message);
     }
     
     public static String createMessage(Object message, String type) {
