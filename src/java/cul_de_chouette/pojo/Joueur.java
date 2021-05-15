@@ -6,6 +6,8 @@
 package cul_de_chouette.pojo;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -45,7 +47,7 @@ public class Joueur implements Serializable {
     @Column(name = "mot_de_passe")
     private String motDePasse;
     @Column(name = "date_naissance")
-    private Integer dateNaissance;
+    private LocalDate dateNaissance;
     @Column(name = "sexe")
     private String sexe;
     @Column(name = "ville")
@@ -96,11 +98,11 @@ public class Joueur implements Serializable {
         this.motDePasse = motDePasse;
     }
 
-    public Integer getDateNaissance() {
+    public LocalDate getDateNaissance() {
         return dateNaissance;
     }
 
-    public void setDateNaissance(Integer dateNaissance) {
+    public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
 
@@ -174,6 +176,13 @@ public class Joueur implements Serializable {
         chouetteVeluesPerdu = this.resultatsCollection.stream().map(resultat -> resultat.getChouettesVeluesPerdues()).reduce(chouetteVeluesPerdu, Integer::sum);
         
         return (float) chouetteVeluesPerdu / (float) this.resultatsCollection.size();
+    }
+    
+    public int getAge() {
+        LocalDate now = LocalDate.now();
+        Period diff = Period.between(this.dateNaissance, now);
+        
+        return diff.getYears();
     }
 
     @Override

@@ -16,32 +16,48 @@
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
     <body>        
-        <div class="container">
-            <div class="row">
-                <div class="col-9" id="actions">
-                    
+        <div class="container"> 
+            <%
+                String pseudo = (String) session.getAttribute("pseudo");
+                String pseudoReq = request.getParameter("pseudo");
+                if(pseudo == null || pseudoReq == null || pseudo != pseudoReq) {
+            %>
+                <div class="alert alert-danger" role="alert">
+                    Vous n'êtes pas connecté !
                 </div>
-                <div class="col-3">
-                    <div id="onlinePlayersContainer">
-                        <p>Point à atteindre : <span id="reachPoint">343</span></p>
-                        <p>Joueur en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
-                        <ol class="list">
-                            
-                        </ol>
+            <%
+                }
+                else {
+            %>
+                <div class="row">
+                    <div class="col-9" id="actions">
+
                     </div>
+                    <div class="col-3">
+                        <div id="onlinePlayersContainer">
+                            <p>Point à atteindre : <span id="reachPoint">343</span></p>
+                            <p>Joueur en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
+                            <ol class="list">
+
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div id="loader">
+                    <%
+                        String gameParam = request.getParameter("game");
+                        if(gameParam != null) {
+                    %>
+                        <button class="btn btn-primary text-center w-100" id="launchGame" disabled>Lancer la partie</button>
+                    <%
+                        }
+                    %>
+                    </div>
+
                 </div>
-                
-                <div id="loader">
-                <%
-                    String gameParam = request.getParameter("game");
-                    if(gameParam != null) {
-                %>
-                    <button class="btn btn-primary text-center w-100" id="launchGame" disabled>Lancer la partie</button>
-                <%
-                    }
-                %>
-                </div>
-            </div>
+            <%
+                }
+            %>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/js/iziToast.min.js"></script>

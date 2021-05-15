@@ -207,5 +207,5 @@ function gameRequest(sender) {
 function redirect(url) {
     console.log(`gameUrl : %c${url}`, 'color: blue; font-size: bold;');    
     // Rediriger vers la bonne page
-    window.location.replace(url);
+    window.location.href = url;
 }
