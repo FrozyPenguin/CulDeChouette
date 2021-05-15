@@ -3,8 +3,6 @@
     Created on : 8 mai 2021, 02:25:26
     Author     : frozy
 --%>
-
-<%@page import="java.util.Base64"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -19,6 +17,8 @@
     </head>
     <body class="container-image" style="padding-top: 20px;">        
         <div class="container"> 
+            <%= request.getParameter("pseudo") %>
+            <%= session.getAttribute("pseudo") %>
             <%
                 String pseudo = (String) session.getAttribute("pseudo");
                 String pseudoReq = request.getParameter("pseudo");
