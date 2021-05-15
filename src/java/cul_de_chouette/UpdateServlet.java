@@ -120,10 +120,10 @@ public class UpdateServlet extends HttpServlet {
             }
             
             response.setStatus(200);
-            JSONObject error = new JSONObject();
-            error.put("status", "200");
-            error.put("error", "Bien enregistré !");
-            out.print(error.toString());
+            JSONObject message = new JSONObject();
+            message.put("status", "200");
+            message.put("message", "Bien enregistré !");
+            out.print(message.toString());
             
             em.close();
         }

@@ -5,13 +5,23 @@
  */
 package cul_de_chouette;
 
+import cul_de_chouette.pojo.Action;
+import cul_de_chouette.pojo.Joueur;
+import cul_de_chouette.pojo.Partie;
+import cul_de_chouette.pojo.Resultats;
 import cul_de_chouette.websocket.WSGame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 import org.json.JSONArray;
@@ -28,6 +38,12 @@ public class Game {
     private String id = null;
     private int reachPoint = 343;
     private int turn = 0;
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CulDeChouettePU");
+    private final EntityManager em = emf.createEntityManager();
+    private EntityTransaction trans;
+    private Partie partie;
+    private Collection<Action> actions;
+    private Collection<Resultats> resultats;
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.optString("id");
@@ -64,6 +80,30 @@ public class Game {
         // A chaque tour, on enregistre les résultats de dès des joueurs en base
         // Comme ça à la fin d'une partie, on a tous enregistré et on a juste à élire le vainqueur
         // Faudra voir par rapport à la base qu'on a
+                
+        try {
+            this.trans = this.em.getTransaction();
+
+            trans.begin();
+            
+            this.partie = new Partie();
+            Joueur hote = this.em.find(Joueur.class, this.getLeader());
+            if(hote == null) throw new Exception("Leader introuvable !");
+            this.partie.setHote(hote);
+            this.partie.setDateDebut(new Date());
+            this.partie.setObjectif(this.reachPoint);
+            
+            em.persist(this.partie);
+            em.flush();
+
+            trans.commit();
+        }
+        catch(Exception ex) {
+            if(trans != null) trans.rollback();
+            this.broadcast(WSGame.createMessage("Erreur de création de partie", "error"), new String[0]);
+            return;
+        }
+        
         System.out.println("Début de la partie !");
         this.broadcast(WSGame.createMessage("empty", "START"), new String[0]);
     }

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -41,27 +42,20 @@ public class ConnectionServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(true);
         
         response.setContentType("application/json;charset=UTF-8");
         
         try(PrintWriter out = response.getWriter()) {
             EntityManagerFactory emf = Persistence.createEntityManagerFactory("CulDeChouettePU");
             EntityManager em = emf.createEntityManager();
-            EntityTransaction trans;
-
-            trans = em.getTransaction();
             
             String pseudonyme = request.getParameter("pseudonyme");
-            String mail = request.getParameter("mail");
             String mdp = request.getParameter("motDePasse");
-            String naiss = request.getParameter("naiss");
-            String sexe = request.getParameter("sexe");
-            String ville = request.getParameter("ville");
             
             if(
-                mail == null || mdp == null || naiss == null || sexe == null || ville == null || pseudonyme == null ||
-                "".equals(mail) || "".equals(mdp) || "".equals(naiss) || "".equals(sexe) || "".equals(ville) || "".equals(pseudonyme)
+                mdp == null || pseudonyme == null ||
+                "".equals(mdp) || "".equals(pseudonyme)
             ) {
                 response.setStatus(500);
                 JSONObject error = new JSONObject();
@@ -72,32 +66,32 @@ public class ConnectionServlet extends HttpServlet {
             }
 
             try {
-                trans.begin();
 
-                Joueur joueur = new Joueur();
-                joueur.setPseudonyme(pseudonyme);
-                joueur.setEmail(mail);
-                joueur.setMotDePasse(mdp);
-                joueur.setVille(ville);
-                joueur.setSexe(sexe);
+                Joueur joueur = em.find(Joueur.class, pseudonyme);
                 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
-
-                //convert String to LocalDate
-                LocalDate dateNaiss = LocalDate.parse(naiss, formatter);
-                joueur.setDateNaissance(dateNaiss);
+                if(joueur == null) {
+                    response.setStatus(404);
+                    JSONObject error = new JSONObject();
+                    error.put("status", "404");
+                    error.put("error", "Pseudonyme invalide !");
+                    out.print(error.toString());
+                    return;
+                }
                 
-                em.persist(joueur);
-
-                trans.commit();
+                if(!joueur.getMotDePasse().equals(mdp)) {
+                    response.setStatus(401);
+                    JSONObject error = new JSONObject();
+                    error.put("status", "401");
+                    error.put("error", "Mot de passe invalide !");
+                    out.print(error.toString());
+                    return;
+                }
             }
-            catch(Exception ex) {
-                if(trans != null) trans.rollback();
-                
+            catch(JSONException ex) {                
                 response.setStatus(500);
                 JSONObject error = new JSONObject();
                 error.put("status", "500");
-                error.put("error", "Erreur d'enregistrement en base !");
+                error.put("error", "Erreur de connexion !");
                 out.print(error.toString());
                 return;
             }
@@ -105,10 +99,10 @@ public class ConnectionServlet extends HttpServlet {
             session.setAttribute("pseudo", pseudonyme);
             
             response.setStatus(200);
-            JSONObject error = new JSONObject();
-            error.put("status", "200");
-            error.put("error", "Bien enregistré !");
-            out.print(error.toString());
+            JSONObject message = new JSONObject();
+            message.put("status", "200");
+            message.put("message", "Connecté !");
+            out.print(message.toString());
             
             em.close();
         }
