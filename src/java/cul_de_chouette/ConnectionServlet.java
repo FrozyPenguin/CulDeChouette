@@ -8,11 +8,8 @@ package cul_de_chouette;
 import cul_de_chouette.pojo.Joueur;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -95,7 +92,8 @@ public class ConnectionServlet extends HttpServlet {
                 out.print(error.toString());
                 return;
             }
-            
+
+            session.removeAttribute("pseudo");
             session.setAttribute("pseudo", pseudonyme);
             
             response.setStatus(200);

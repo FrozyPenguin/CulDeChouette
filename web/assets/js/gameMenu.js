@@ -9,7 +9,7 @@ import { Message } from './Message.js';
     if(!urlParams.has('pseudo') || !urlParams.get('pseudo')) window.history.back();
     const pseudo = urlParams.get('pseudo');
 
-    let websocket = createWebSocket(`ws://localhost:8081/menu/${pseudo}`);
+    let websocket = createWebSocket(`ws://${window.location.hostname}:${window.location.port}/menu/${pseudo}`);
 
     function createWebSocket(url) {
         const websocket = new WebSocket(url);
@@ -84,7 +84,7 @@ import { Message } from './Message.js';
         check.classList.add('text-center');
         order.innerHTML = `
             <td class="text-center">
-                <input type="number" min="2" step="1" max="0" disabled>
+                <input type="number" min="2" step="1" max="0" disabled class="formum w-100">
             </td>`;
 
         console.log('added');
@@ -96,6 +96,7 @@ import { Message } from './Message.js';
 
     function initMenu(players) {
         console.log(players);
+        if(players.includes(pseudo)) window.history.back();
         players.forEach(player => addPlayerToList(player));
 
         const beginButton = document.querySelector('#gameBegin');

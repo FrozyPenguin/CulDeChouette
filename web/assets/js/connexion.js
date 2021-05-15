@@ -39,8 +39,8 @@ function majPage () {
             transitionIn: 'fadeIn',
             timeout: 1000,
             pauseOnHover: false,
-            onClosed: function(instance, toast, closedBy){
-                window.location.href = redirectionUrl + document.getElementById('pseudonyme').value;
+            onClosing: (instance, toast, closedBy) => {
+                    window.location.href = redirectionUrl + document.getElementById('pseudonyme').value;
                 }
             });
         } else {

@@ -13,14 +13,15 @@
 </head>
 
 <body style="padding-top: 20px;" class="container-image">
-    <div class="container">
+    <div class="container box" style="position: relative">
     <%
         String pseudo = (String) session.getAttribute("pseudo");
         String pseudoReq = request.getParameter("pseudo");
-        if(pseudo == null || pseudoReq == null || pseudo != pseudoReq) {
+        if(pseudo == null || pseudoReq == null || !pseudo.equals(pseudoReq)) {
     %>
         <div class="alert alert-danger" role="alert" id="alert">
             Vous n'êtes pas connecté !
+            <%= pseudo + "      " + pseudoReq %>
         </div>
     <%
         }
@@ -29,7 +30,7 @@
         <a class="linkas" href="update.jsp" id="update">Mettre à jour ses informations</a>
         <h1 class="text-center">Avec qui voulez-vous jouer ?</h1>
         <div class="table-responsive">
-            <table class="table table-striped table-hover table-bordered">
+            <table class="table table-striped table-hover table-bordered table-responsive table-dark">
                 <thead>
                     <tr>
                         <th>Joueur</th>
@@ -41,8 +42,9 @@
                 </tbody>
             </table>
         </div>
-        <input class="form-control w-100 pb-2 formum" type="number" id="gamePoint" min="0" max="343" value="343" />
-        <button class="btn btn-primary text-center w-100 butonas" id="gameBegin" type="button">Commencer une partie</button>
+        <label for="reach">Points de fin de partie :</label>
+        <input name="reach" class="form-control w-100 mb-2 formum" type="number" id="gamePoint" min="0" max="343" value="343" />
+        <button class="btn btn-light text-center w-100 butonas" id="gameBegin" type="button">Commencer une partie</button>
     <%
         }
     %>

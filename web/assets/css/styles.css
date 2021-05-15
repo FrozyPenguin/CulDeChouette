@@ -1,12 +1,22 @@
 * {
     padding: 0;
     margin: 0;
+    font-family: Quicksand, sans-serif;
+}
+
+.box {
+  padding: 40px;
+  border-radius: 4px;
+  color: #fff;
+  box-shadow: 3px 3px 4px rgba(0,0,0,0.2);
+  background-color: rgba(44,40,52,0.73);
 }
 
 body {
     height: 100vh;
     width: 100%;
     overflow: auto;
+    color: white;
 }
 
 .container-center {
@@ -31,4 +41,46 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
+}
+
+.connected {
+    color: white;
+}
+
+.disconnected {
+    color: red;
+    position: relative;
+}
+
+.disconnected::after {
+    content: url('data:image/svg+xml;utf8,<svg fill="none" stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M6 18L18 6M6 6l12 12" /></svg>');
+    position: absolute;
+    height: 1em;
+    width: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.connected::after {
+    content: url('data:image/svg+xml;utf8,<svg fill="none" stroke="green" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>');
+    position: absolute;
+    height: 1em;
+    width: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#controls {
+    position: fixed;
+    bottom: 0px;
+}
+
+#controlButton {
+    width: 20%;
+    height: 40%;
+    margin-bottom: 10px; 
+    margin-right: 10px; 
+    background-color: rgb(221,172,24);
+    color: rgb(255,255,255);
+    font-size: 17px;
 }

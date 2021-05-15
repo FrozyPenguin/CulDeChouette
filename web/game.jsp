@@ -16,13 +16,11 @@
         <link rel="stylesheet" href="assets/css/styles.css">
     </head>
     <body class="container-image" style="padding-top: 20px;">        
-        <div class="container"> 
-            <%= request.getParameter("pseudo") %>
-            <%= session.getAttribute("pseudo") %>
+        <div class="container box">
             <%
                 String pseudo = (String) session.getAttribute("pseudo");
                 String pseudoReq = request.getParameter("pseudo");
-                if(pseudo == null || pseudoReq == null || pseudo != pseudoReq) {
+                if(pseudo == null || pseudoReq == null || !pseudo.equals(pseudoReq)) {
             %>
                 <div class="alert alert-danger" role="alert" id="alert">
                     Vous n'êtes pas connecté !
@@ -37,8 +35,8 @@
                     </div>
                     <div class="col-3">
                         <div id="onlinePlayersContainer">
-                            <p>Point à atteindre : <span id="reachPoint">343</span></p>
-                            <p>Joueur en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
+                            <p>Points à atteindre : <span id="reachPoint">343</span></p>
+                            <p>Joueurs en ligne : <span id="actualPlayers">0</span>/<span id="totalPlayers">0</span></p>
                             <ol class="list">
 
                             </ol>
@@ -54,6 +52,12 @@
                     <%
                         }
                     %>
+                    </div>
+
+                    <div class="d-flex justify-content-start" id="controls">
+                        <button class="btn btn-light butonas" type="button" id="lancerDes" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px;" disabled>Lancer les dés</button>
+                        <button class="btn btn-light butonas" type="button" id="suite" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px;" disabled>"Grelotte ça picote !"</button>
+                        <button class="btn btn-light butonas" type="button" id="chouetteVelue" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px;" disabled>"Pas mou le caillou !"</button>
                     </div>
 
                 </div>

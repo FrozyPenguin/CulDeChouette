@@ -15,7 +15,7 @@
         window.history.back();
     }
 
-    let websocketUrl = `ws://localhost:8081/game/${urlParams.get('pseudo')}/${urlParams.get('id')}`;
+    let websocketUrl = `ws://${window.location.hostname}:${window.location.port}/game/${urlParams.get('pseudo')}/${urlParams.get('id')}`;
 
     if(urlParams.has('game')) {
         websocketUrl += `?game=${urlParams.get('game')}`;
@@ -103,6 +103,7 @@
     const launchButton = document.querySelector("#loader #launchGame");
     if(launchButton) {
         launchButton.addEventListener('click', (event) => {
+            launchButton.style.display = "none";
             websocket.send('startCountdown');
         });
     }
@@ -152,7 +153,7 @@
 
     function setReachPoint(point) {
         document.querySelector('#reachPoint').innerHTML = point;
-        createAction(`Point de fin de partie définie sur ${point} points.`, 'color: orange; font-weight: bold;');
+        createAction(`Score de fin de partie défini sur ${point} points.`, 'color: orange; font-weight: bold;');
     }
 
     function createAction(action, css) {
@@ -165,6 +166,7 @@
         actionsBox.scrollTop = actionsBox.scrollHeight;
     }
 
+    /* 1 */
     function startCountdown(count) {
         if(!count && count !== 0) return;
         if(count <= 0) {
@@ -177,6 +179,7 @@
         }, 1000);
     }
 
+    /* 2 */
     function startGame(startObj) {
         console.log('start');
         createAction(`La partie commence ! Préparez-vous !`, 'color: black; font-weight: bold; font-size: 1.5em;');

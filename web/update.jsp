@@ -20,7 +20,7 @@
         <%
             String pseudo = (String) session.getAttribute("pseudo");
             String pseudoReq = request.getParameter("pseudo");
-            if(pseudo == null || pseudoReq == null || pseudo != pseudoReq) {
+            if(pseudo == null || pseudoReq == null || !pseudo.equals(pseudoReq)) {
         %>
             <div class="alert alert-danger" role="alert">
                 Vous n'êtes pas connecté !
@@ -45,7 +45,7 @@
                     String naiss = joueur.getDateNaissance().format(formatters);
         %>
             <div class="d-flex justify-content-center align-items-center container-center container-image">
-                <form id="form" style="font-family: Quicksand, sans-serif;background-color: rgba(44,40,52,0.73); height: fit-content;" >
+                <form class="box" id="form" style="font-family: Quicksand, sans-serif;background-color: rgba(44,40,52,0.73); height: fit-content;" >
                     <div id="errorBox" class="alert alert-danger" role="alert" style="display: none">
                     </div>
                     <h1 id="head" style="color:rgb(193,166,83);">Modification de <%=pseudo%></h1>

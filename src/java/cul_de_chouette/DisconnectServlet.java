@@ -37,7 +37,7 @@ public class DisconnectServlet extends HttpServlet {
         try(PrintWriter out = response.getWriter()) {
             HttpSession session = request.getSession();
             try {
-                session.invalidate();
+                session.removeAttribute("pseudo");
                 out.println("OK");
             }
             catch(Exception ex) {

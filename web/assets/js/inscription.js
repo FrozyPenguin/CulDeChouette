@@ -41,7 +41,7 @@ function majPage () {
             message: 'Vous allez être redirigé.',
             position: 'center',
             transitionIn: 'fadeIn',
-            onClosed: function(instance, toast, closedBy){
+            onClosing: function(instance, toast, closedBy){
                 window.location.href = redirectionUrl;
                 }
             });

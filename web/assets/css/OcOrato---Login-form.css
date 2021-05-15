@@ -1,9 +1,5 @@
 #form {
   max-width: 333px;
-  padding: 40px;
-  border-radius: 4px;
-  color: #fff;
-  box-shadow: 3px 3px 4px rgba(0,0,0,0.2);
 }
 
 #head {
@@ -24,12 +20,19 @@
   font-size: 12px;
   opacity: 0.9;
   text-decoration: none;
+  font-size: 17px;
+  color: rgb(177,151,70);
 }
 
 .butonas {
-  background: #70b2d0;
+  /*background: #70b2d0;*/
   outline: none;
   text-shadow: initial;
+  background-color: rgb(221,172,24);
+  margin-bottom: 10px;
+  background-color: rgb(221,172,24);
+  color: rgb(255,255,255);
+  font-size: 17px;
 }
 
 .formum {
