@@ -85,6 +85,7 @@
             else if('ROLL' in data) showDice(data['ROLL']);
             else if('RESULT' in data) processResults(data['RESULT']);
             else if('INTERACT' in data) processInteract(data['INTERACT']);
+            else if('END' in data) processEnd(data['END']);
         }
     };
 
@@ -189,7 +190,8 @@
         
         function singleLine(action) {
             let p = document.createElement('p');
-            p.innerHTML = action;
+            let date = new Date();
+            p.innerHTML = `[${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}] ${action}`;
             if(css) p.setAttribute('style', css);
             actionsBox.appendChild(p);
         }
@@ -213,7 +215,7 @@
     /* 2 */
     function startGame(startObj) {
         console.log('start');
-        createAction(`La partie commence ! Préparez-vous !`, 'color: black; font-weight: bold; font-size: 1.5em;');
+        createAction(`La partie commence ! Préparez-vous !`, 'font-weight: bold; font-size: 1.5em;');
     }
     
     function playerTurn(player) {
@@ -242,6 +244,7 @@
     
     lancerDesButton.addEventListener('click', (event) => {
         if(myTurn) websocket.send('ROLL');
+        lancerDesButton.disabled = true;
     });
     
     function showDice(results) {
@@ -293,5 +296,23 @@
         else createAction(`${interraction.pseudo} a marqué ${interraction.points - parseInt(score.innerHTML)} points !`);
         console.log(`Point actuel : %c${interraction.points}`, 'color: cyan');
         score.innerHTML = interraction.points;
+    }
+
+    function processEnd(end) {
+        // gagnant / points
+        createAction("Le vainqueur est " + end.gagnant + " avec " + end.points + " points !", "color: orange; font-size: 30px; text-decoration: underline;");
+        iziToast.warning({
+            title: 'Partie terminée !',
+            message: "Le vainqueur est " + end.gagnant + " avec " + end.points + " points !",
+            position: 'center',
+            transitionIn: 'fadeIn',
+            timeout: 10000,
+            drag: false,
+            titleSize: '30px',
+            messageSize: '16px',
+            onClosing: function(instance, toast, closedBy){
+                window.location.replace('gameMenu.jsp');
+                }
+            });
     }
 })();

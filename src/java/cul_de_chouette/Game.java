@@ -147,8 +147,12 @@ public class Game {
         gagnantObject.put("points", resultatInCollection.getScore());
         this.broadcast(WSGame.createMessage(gagnantObject, "END"), new String[0]);
         
+        
         // Enregistrement des resultats et des actions en base
+        // en plus des informations de fin de partie
         this.trans.begin();
+        this.partie.setDuree((float)(this.partie.getDateDebut().getTime() - new Date().getTime()) / 1000);
+        this.partie.setVainqueur(gagnant);
         this.partie.setActionCollection(this.actions);
         this.partie.setResultatsCollection(this.resultats);
         this.trans.commit();
@@ -231,6 +235,7 @@ public class Game {
             result.put("interact", "Pas mou le caillou !");
             this.pendingPoints = Math.pow(cul, 2);
             this.pendingInteract = "Chouette velute";
+            result.put("points", 0);
         }
         else {
             int resultArray[] = {chouette1, chouette2, cul};
@@ -242,6 +247,7 @@ public class Game {
                 this.pendingPoints = -10;
                 this.pendingInteract = "Suite";
             }
+            else result.put("action", "Néant");
             
             result.put("points", 0);
         }
@@ -250,15 +256,12 @@ public class Game {
             Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(dice.getString("pseudo"))).findFirst().get();
             resultatInCollection.setScore(resultatInCollection.getScore() + result.getInt("points"));
             result.put("points", resultatInCollection.getScore());
-            
-            if(!this.isOver()) this.nextTurn();
         }
         
         this.actions.add(action);
         
         this.broadcast(WSGame.createMessage(result, "RESULT"), new String[0]);
-        
-        this.isOver();
+        if(!result.has("interact") && !this.isOver()) this.nextTurn();
     }
     
     public void handleInteraction(String joueur) {
@@ -318,9 +321,9 @@ public class Game {
     }
     
     public boolean isOver() {
-        Joueur gagnant = null;
+        Joueur gagnant;
         try {
-            this.resultats.stream().filter(result -> (result.getScore() >= this.reachPoint)).findFirst().get().getJoueur();
+            gagnant = this.resultats.stream().filter(result -> (result.getScore() >= this.reachPoint)).findFirst().get().getJoueur();
         }
         catch(Exception ex) {
             return false;
