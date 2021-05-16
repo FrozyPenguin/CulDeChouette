@@ -224,6 +224,13 @@
     }
     
     function processResults(results) {
-        
+        let score = documentList.querySelector(`li:nth-of-type(${results.position}) span.score`);
+        if('interact' in results) {
+            // Il y a interraction entre joueur
+        }
+        else {
+            // C'est sans intérraction
+            score.innerHTML = score.innerHTML.parseInt() + results.points;
+        }
     }
 })();

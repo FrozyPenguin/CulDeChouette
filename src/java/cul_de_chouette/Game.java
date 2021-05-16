@@ -12,6 +12,7 @@ import cul_de_chouette.pojo.InterractionPK;
 import cul_de_chouette.pojo.Joueur;
 import cul_de_chouette.pojo.Partie;
 import cul_de_chouette.pojo.Resultats;
+import cul_de_chouette.pojo.ResultatsPK;
 import cul_de_chouette.websocket.WSGame;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +20,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -109,6 +112,23 @@ public class Game {
             return;
         }
         
+        this.users.entrySet().forEach(entry -> {
+            int key = entry.getKey();
+            Joueur value = entry.getValue();
+            Resultats result = new Resultats();
+            result.setJoueur(value);
+            result.setOrdre(key);
+            result.setPartie(this.partie);
+            
+            ResultatsPK resultatsPK = new ResultatsPK();
+            resultatsPK.setIdPartie(this.partie.getIdPartie());
+            resultatsPK.setPseudonyme(value.getPseudonyme());
+            
+            result.setResultatsPK(resultatsPK);
+            
+            this.resultats.add(result);
+        });
+        
         System.out.println("Début de la partie !");
         this.broadcast(WSGame.createMessage("empty", "START"), new String[0]);
         this.nextTurn();
@@ -148,10 +168,18 @@ public class Game {
         dice.put("chouette", chouette);
         dice.put("cul", Game.roll());
         dice.put("pseudo", this.getUserTurn());
+        dice.put("position", this.getPosForUser(this.getUserTurn()));
         
         this.broadcast(WSGame.createMessage(dice, "ROLL"), new String[0]);
         
         this.processDice(dice);
+    }
+    
+    public int getPosForUser(String pseudo) {
+        return this.users.keySet()
+                        .stream()
+                        .filter(key -> em.find(Joueur.class, pseudo).equals(this.users.get(key)))
+                        .findFirst().get();
     }
     
     private void processDice(JSONObject dice) {        
@@ -174,6 +202,7 @@ public class Game {
         
         JSONObject result = new JSONObject();
         result.put("pseudo", dice.getString("pseudo"));
+        result.put("position", dice.getInt("position"));
         
         if(cul == chouette1 + chouette2 && cul != chouette1) {
             result.put("action", "Velute");
@@ -199,11 +228,14 @@ public class Game {
             if(resultArray[0] + 1 == resultArray[1] && resultArray[1] + 1 == resultArray[2]) {
                 result.put("action", "Suite");
                 result.put("interact", "Grelotte ça picote !");
+                this.pendingPoints = -10;
             }
             
-            // TODO: A vérifier
-            // Je crois que c'est ça
-            result.put("points", chouette1 + chouette2 + cul);
+            result.put("points", 0);
+        }
+        
+        if(!result.has("interact")) {
+            Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(dice.getString("pseudo"))).findFirst().get();
         }
         
         this.actions.add(action);
@@ -229,19 +261,16 @@ public class Game {
     }
     
     public void addUser(Session session) throws GameException {
-        if(this.users.containsValue(session.getPathParameters().get("pseudo"))) {
+        Joueur joueur = em.find(Joueur.class, session.getPathParameters().get("pseudo"));
+        if(this.users.containsValue(joueur)) {
             this.listeWS.add(session);
             
             JSONArray connectedList = new JSONArray();
             this.listeWS.forEach(user -> {
                 JSONObject userObject = new JSONObject();
                 userObject.put("pseudo", user.getPathParameters().get("pseudo"));
-                userObject.put("position", 
-                    this.users.keySet()
-                        .stream()
-                        .filter(key -> user.getPathParameters().get("pseudo").equals(this.users.get(key)))
-                        .findFirst().get()
-                );
+                userObject.put("position", this.getPosForUser(user.getPathParameters().get("pseudo")));
+                
                 connectedList.put(userObject);
             });
             
@@ -267,7 +296,7 @@ public class Game {
             userObject.put("position", 
                 this.users.keySet()
                     .stream()
-                    .filter(key -> user.getPathParameters().get("pseudo").equals(this.users.get(key)))
+                    .filter(key ->  em.find(Joueur.class, user.getPathParameters().get("pseudo")).equals(this.users.get(key)))
                     .findFirst().get()
             );
             connectedList.put(userObject);
