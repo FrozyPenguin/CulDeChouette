@@ -311,7 +311,7 @@
             titleSize: '30px',
             messageSize: '16px',
             onClosing: function(instance, toast, closedBy){
-                window.location.replace('gameMenu.jsp');
+                window.location.replace(`gameMenu.jsp?pseudo=${playerPseudo}`);
                 }
             });
     }

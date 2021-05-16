@@ -151,7 +151,7 @@ public class Game {
         // Enregistrement des resultats et des actions en base
         // en plus des informations de fin de partie
         this.trans.begin();
-        this.partie.setDuree((float)(this.partie.getDateDebut().getTime() - new Date().getTime()) / 1000);
+        this.partie.setDuree((float)(new Date().getTime() - this.partie.getDateDebut().getTime()) / 1000);
         this.partie.setVainqueur(gagnant);
         this.partie.setActionCollection(this.actions);
         this.partie.setResultatsCollection(this.resultats);
