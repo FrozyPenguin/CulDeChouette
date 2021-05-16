@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cul_de_chouette;
+package cul_de_chouette.servlets;
 
 import cul_de_chouette.pojo.Joueur;
 import java.io.IOException;
@@ -43,7 +43,8 @@ public class ConnectionServlet extends HttpServlet {
         
         response.setContentType("application/json;charset=UTF-8");
         
-        try(PrintWriter out = response.getWriter()) {
+        try {
+            PrintWriter out = response.getWriter();
             EntityManagerFactory emf = Persistence.createEntityManagerFactory("CulDeChouettePU");
             EntityManager em = emf.createEntityManager();
             
@@ -104,7 +105,7 @@ public class ConnectionServlet extends HttpServlet {
             
             em.close();
         }
-        catch(Exception ex) {
+        catch(IOException | JSONException ex) {
             PrintWriter out = response.getWriter();
             response.setStatus(500);
             JSONObject error = new JSONObject();

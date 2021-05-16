@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cul_de_chouette;
+package cul_de_chouette.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -167,7 +167,7 @@ public class Joueur implements Serializable {
         
         suitesGagnee = this.resultatsCollection.stream().map(resultat -> resultat.getSuitesGagnees()).reduce(suitesGagnee, Integer::sum);
         
-        return (float) suitesGagnee / (float) this.resultatsCollection.size();
+        return this.resultatsCollection.isEmpty() ? 0 : (float) suitesGagnee / (float) this.resultatsCollection.size();
     }
     
     public float getMoyChouetteVeluesPerdu() {
@@ -175,7 +175,15 @@ public class Joueur implements Serializable {
         
         chouetteVeluesPerdu = this.resultatsCollection.stream().map(resultat -> resultat.getChouettesVeluesPerdues()).reduce(chouetteVeluesPerdu, Integer::sum);
         
-        return (float) chouetteVeluesPerdu / (float) this.resultatsCollection.size();
+        return this.resultatsCollection.isEmpty() ? 0 : (float) chouetteVeluesPerdu / (float) this.resultatsCollection.size();
+    }
+    
+    public float getMoyScore() {
+        int score = 0;
+        
+        score = this.resultatsCollection.stream().map(resultat -> resultat.getScore()).reduce(score, Integer::sum);
+        
+        return this.resultatsCollection.isEmpty() ? 0 : (float) score / (float) this.resultatsCollection.size();
     }
     
     public int getAge() {

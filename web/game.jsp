@@ -22,7 +22,7 @@
                 String pseudoReq = request.getParameter("pseudo");
                 if(pseudo == null || pseudoReq == null || !pseudo.equals(pseudoReq)) {
             %>
-                <div class="alert alert-danger" role="alert" id="alert">
+                <div class="alert alert-danger m-0" role="alert" id="alert">
                     Vous n'êtes pas connecté !
                 </div>
             <%

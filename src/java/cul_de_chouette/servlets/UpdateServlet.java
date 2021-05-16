@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cul_de_chouette;
+package cul_de_chouette.servlets;
 
 import cul_de_chouette.pojo.Joueur;
 import java.io.IOException;
