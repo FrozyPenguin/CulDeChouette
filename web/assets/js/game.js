@@ -6,7 +6,15 @@
 
 (() => {
     const alert = document.querySelector('#alert');
-    if(alert) return;
+    if(alert) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "DisconnectServlet");
+        
+        setTimeout(() => {
+            window.location.replace('index.html');
+        }, 5000);
+        return;
+    }
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -34,7 +42,7 @@
     let myTurn = false;
     
     // Boutons
-    const lancerDesButton = document.querySelector('#lancerDes');
+    const lancerDesButton = document.querySelector('#actionLancerDes');
     const crierButton = document.querySelector('#actionCrier');
     
     // Liste des joueurs
@@ -156,8 +164,10 @@
             const span = document.createElement('span');
             span.classList.add('score');
             span.innerHTML = 0;
+            span.style.float = 'right';
             li.innerHTML = user;
             li.classList.add(user === 'En attente' ? 'disconnected' : 'connected');
+            li.append(span);
             documentList.appendChild(li);
         });
 
@@ -222,7 +232,11 @@
             element.classList.remove('actualTurn');            
         });
         
-        const pos = currentUsers.filter(user => user.pseudo === player).position;
+        console.log(currentUsers);
+        console.log(player);
+        console.log(currentUsers.filter(user => user.pseudo === player));
+        
+        const pos = currentUsers.filter(user => user.pseudo === player)[0].position;
         documentList.querySelector(`li:nth-of-type(${pos})`).classList.add('actualTurn');
     }
     
@@ -232,7 +246,10 @@
     
     function showDice(results) {
         if(results.pseudo === playerPseudo) {
-            createAction([`${results.pseudo} à obtenu les dès :`, `- Chouette : ${results.chouette[0]} et ${results.chouette[1]}`, `- Cul ${results.cul}`]);
+            createAction([`Vous avez obtenu les dès :`, `- Chouette : ${results.chouette[0]} et ${results.chouette[1]}`, `- Cul : ${results.cul}`], 'color: orange');
+        }
+        else {
+            createAction([`${results.pseudo} à obtenu les dès :`, `- Chouette : ${results.chouette[0]} et ${results.chouette[1]}`, `- Cul : ${results.cul}`]);
         }
     }
     
@@ -243,9 +260,21 @@
             crierButton.innerHTML = results.action;
             crierButton.style.display = 'block';
             crierButton.disabled = false;
+            if(results.pseudo === playerPseudo) createAction(`Vous avez effectué un(e) ${results.action} ! Cliquez vite pour remporter !`, 'color: orange');
+            else createAction(`${results.pseudo} a effectué un(e) ${results.action} ! Cliquez vite pour remporter !`);
         }
         else {
             // C'est sans intérraction
+            
+            if(results.pseudo === playerPseudo) {
+                createAction(`Vous avez effectué  un(e) ${results.action} !` , 'color: orange');
+                createAction(`Vous avez marqué ${results.points - parseInt(score.innerHTML)} points !` , 'color: orange');
+            }
+            else {
+                createAction(`${results.pseudo} a effectué un(e) ${results.action} !`);
+                createAction(`${results.pseudo} a marqué ${results.points - parseInt(score.innerHTML)} points !`);
+            }
+            console.log(`Point actuel : %c${results.points}`, 'color: cyan');
             score.innerHTML = results.points;
         }
     }
@@ -260,6 +289,9 @@
     
     function processInteract(interraction) {
         let score = documentList.querySelector(`li:nth-of-type(${interraction.position}) span.score`);
+        if(interraction.pseudo === playerPseudo) createAction(`Vous avez marqué ${interraction.points - parseInt(score.innerHTML)} points !`, 'color: orange');
+        else createAction(`${interraction.pseudo} a marqué ${interraction.points - parseInt(score.innerHTML)} points !`);
+        console.log(`Point actuel : %c${interraction.points}`, 'color: cyan');
         score.innerHTML = interraction.points;
     }
 })();

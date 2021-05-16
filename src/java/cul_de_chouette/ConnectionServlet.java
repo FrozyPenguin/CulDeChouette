@@ -39,7 +39,7 @@ public class ConnectionServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession();
         
         response.setContentType("application/json;charset=UTF-8");
         
@@ -66,7 +66,7 @@ public class ConnectionServlet extends HttpServlet {
 
                 Joueur joueur = em.find(Joueur.class, pseudonyme);
                 
-                if(joueur == null) {
+                if(joueur == null || !joueur.getPseudonyme().equals(pseudonyme)) {
                     response.setStatus(404);
                     JSONObject error = new JSONObject();
                     error.put("status", "404");
@@ -103,6 +103,14 @@ public class ConnectionServlet extends HttpServlet {
             out.print(message.toString());
             
             em.close();
+        }
+        catch(Exception ex) {
+            PrintWriter out = response.getWriter();
+            response.setStatus(500);
+            JSONObject error = new JSONObject();
+            error.put("status", "500");
+            error.put("error", "Erreur de connexion !");
+            out.print(error.toString());
         }
     }
 

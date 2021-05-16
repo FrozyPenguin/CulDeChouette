@@ -2,7 +2,17 @@ import { Message } from './Message.js';
 
 (() => {
     const alert = document.querySelector('#alert');
-    if(alert) return;
+    if(alert) {
+        console.log('disconnect');
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "DisconnectServlet");
+        
+        setTimeout(() => {
+            console.log('redirect');
+            window.location.replace('index.html');
+        }, 5000);
+        return;
+    }
     
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);

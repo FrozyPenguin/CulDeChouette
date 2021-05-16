@@ -21,9 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,11 +47,11 @@ public class Game {
     private final EntityManager em = emf.createEntityManager();
     private EntityTransaction trans;
     private Partie partie;
-    private Collection<Action> actions;
-    private Collection<Resultats> resultats;
+    private final Collection<Action> actions = new ArrayList<>();
+    private final Collection<Resultats> resultats = new ArrayList<>();
     private double pendingPoints;
     private String pendingInteract = null;
-    private HashSet<String> arrivalOrder = new HashSet<>();
+    private final HashSet<String> arrivalOrder = new HashSet<>();
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.optString("id");
@@ -143,6 +141,12 @@ public class Game {
         // Pour les suites c'est la même chose mais en comptant les effets positifs
         // Pour le score final, on additionne les scores du joueur à chaque tour
         
+        JSONObject gagnantObject = new JSONObject();
+        gagnantObject.put("gagnant", gagnant.getPseudonyme());
+        Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(gagnant.getPseudonyme())).findFirst().get();
+        gagnantObject.put("points", resultatInCollection.getScore());
+        this.broadcast(WSGame.createMessage(gagnantObject, "END"), new String[0]);
+        
         // Enregistrement des resultats et des actions en base
         this.trans.begin();
         this.partie.setActionCollection(this.actions);
@@ -154,6 +158,7 @@ public class Game {
         // retourne le joueur qui doit jouer
         this.turn ++;
         
+        System.out.println("Tour de " + this.getUserTurn());
         this.broadcast(WSGame.createMessage(this.getUserTurn(), "TURN"), new String[0]);
     }
     
@@ -292,12 +297,19 @@ public class Game {
         Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(joueurAffecte.getPseudonyme())).findFirst().get();
         resultatInCollection.setScore(resultatInCollection.getScore() + (int) this.pendingPoints);
         
+        if(interraction.getEffet() == 'P') {
+            resultatInCollection.setSuitesGagnees(resultatInCollection.getSuitesGagnees() + 1);
+        }
+        else {
+            resultatInCollection.setChouettesVeluesPerdues(resultatInCollection.getChouettesVeluesPerdues() + 1);
+        }
+        
         JSONObject interactObject = new JSONObject();
         interactObject.put("pseudo", joueurAffecte.getPseudonyme());
         interactObject.put("position", this.getPosForUser(joueurAffecte.getPseudonyme()));
         interactObject.put("points", resultatInCollection.getScore());
         
-        this.broadcast(WSGame.createMessage(this.getPosForUser(joueurAffecte.getPseudonyme()), "INTERACT"), new String[0]);
+        this.broadcast(WSGame.createMessage(interactObject, "INTERACT"), new String[0]);
         
         // Ajout de l'interraction à la dernière actions enregistré dans la partie
         this.actions.toArray(new Action[0])[this.actions.size() - 1].setInterraction(interraction);
@@ -306,7 +318,14 @@ public class Game {
     }
     
     public boolean isOver() {
-        Joueur gagnant = this.resultats.stream().filter(result -> (result.getScore() >= this.reachPoint)).findFirst().get().getJoueur();
+        Joueur gagnant = null;
+        try {
+            this.resultats.stream().filter(result -> (result.getScore() >= this.reachPoint)).findFirst().get().getJoueur();
+        }
+        catch(Exception ex) {
+            return false;
+        }
+        
         if(gagnant != null) {
             this.endGame(gagnant);
             return true;
@@ -420,7 +439,7 @@ public class Game {
     }
     
     public String getUserAtPos(int pos) {
-        return this.users.size() > pos ? this.users.get(pos).getPseudonyme() : "";
+        return this.users.size() > pos-1 ? this.users.get(pos).getPseudonyme() : "";
     }
     
     public ArrayList<Session> getUsersWS() {
@@ -428,6 +447,7 @@ public class Game {
     }
     
     public String getUserTurn() {
+        System.out.println("Position " + (((this.turn - 1) % this.users.size()) + 1));
         return this.getUserAtPos(((this.turn - 1) % this.users.size()) + 1);
     }
     

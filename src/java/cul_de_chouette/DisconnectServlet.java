@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author frozy
  */
-@WebServlet(name = "disconnectServlet", urlPatterns = {"/disconnectServlet"})
+@WebServlet(name = "DisconnectServlet", urlPatterns = {"/DisconnectServlet"})
 public class DisconnectServlet extends HttpServlet {
 
     /**
@@ -35,9 +35,10 @@ public class DisconnectServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         try(PrintWriter out = response.getWriter()) {
-            HttpSession session = request.getSession();
+            HttpSession session = request.getSession(false);
             try {
                 session.removeAttribute("pseudo");
+                session.invalidate();
                 out.println("OK");
             }
             catch(Exception ex) {
