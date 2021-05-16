@@ -110,9 +110,9 @@ public class Action implements Serializable {
     public Joueur getJoueurCourant() {
         Collection<Resultats> resultats = this.partie.getResultatsCollection();
         
-        int indexJoueur = (this.actionPK.getTour() - 1) % resultats.size();
+        int indexJoueur = ((this.actionPK.getTour() - 1) % resultats.size()) + 1;
         
-        return resultats.toArray(new Resultats[0])[indexJoueur].getJoueur();
+        return resultats.stream().filter(resultat -> resultat.getOrdre() == indexJoueur).findFirst().get().getJoueur();
     }
 
     @Override

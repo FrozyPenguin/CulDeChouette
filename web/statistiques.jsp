@@ -87,7 +87,7 @@
                                                 }
                                                 for(Partie partie : parties) {
                                                     
-                                                    DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy hh:mm:ss");  
+                                                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");  
                                                 
                                             %>
 
@@ -101,10 +101,14 @@
                                                         <div class="accordion-body bg-dark">
                                                             <p>ID: <%= partie.getIdPartie() %></p>
                                                             <p>Début de la partie: <%= dateFormat.format(partie.getDateDebut()) %></p>
-                                                            <p>Durée de la partie: <%= partie.getDuree()*60 %> minutes</p>
+                                                            <% if(partie.getDuree() != null) {%>
+                                                                <p>Durée de la partie: <%= partie.getDuree()/60 %> minutes</p>
+                                                            <% } %>
                                                             <p>Hôte de la partie: <%= partie.getHote().getPseudonyme() %></p>
                                                             <p>Points de fin de partie: <%= partie.getObjectif() %></p>
-                                                            <p>Vainqueur de la partie: <%= partie.getVainqueur().getPseudonyme() %></p>
+                                                            <% if(partie.getVainqueur() != null) {%>
+                                                                <p>Vainqueur de la partie: <%= partie.getVainqueur().getPseudonyme() %></p>
+                                                            <% } %>
                                                             <%
                                                                 if(!partie.getActionCollection().isEmpty()) {
                                                             %>
@@ -129,36 +133,37 @@
                                                                                 <p>Cul: <%= action.getCul() %></p>
                                                                                 <p>Tour de: <%= action.getJoueurCourant().getPseudonyme() %></p>
                                                                                 <%
-                                                                                    if(action.getInterraction() != null) {
-                                                                                        Interraction interact = action.getInterraction();
-                                                                                        if(action.getCul() == action.getChouette1() + action.getChouette2() && action.getCul() != action.getChouette1()) {
-                                                                                            out.println("<p>Résultat: Velute</p>");
-                                                                                            out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + Math.pow(action.getCul(), 2) + " points</p>");
-                                                                                        }
-                                                                                        else if(action.getChouette1() == action.getChouette2() && action.getChouette2() != action.getCul()) {
-                                                                                            out.println("<p>Résultat: Chouette</p>");
-                                                                                            out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + Math.pow(action.getChouette1(), 2) + " points</p>");
-                                                                                        }
-                                                                                        else if(action.getChouette1() == action.getChouette2() && action.getChouette2() == action.getCul()) {
-                                                                                            out.println("<p>Résultat: Cul de chouette</p>");
-                                                                                            out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + (40 + action.getChouette1() * 10) + " points</p>");
-                                                                                        }
-                                                                                        else if(action.getChouette1() == action.getChouette2() && action.getChouette1() + action.getChouette2() == action.getCul()) {
-                                                                                            out.println("<p>Résultat: Chouette velute</p>");
-                                                                                            out.println("<p>Le joueur " + interact.getJoueurAffecte().getPseudonyme() + " a remporté: " + Math.pow(action.getCul(), 2) + " points</p>");                                                                                            
+                                                                                    if(action.getCul() == action.getChouette1() + action.getChouette2() && action.getCul() != action.getChouette1()) {
+                                                                                        out.println("<p>Résultat: Velute</p>");
+                                                                                        out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + Math.pow(action.getCul(), 2) + " points</p>");
+                                                                                    }
+                                                                                    else if(action.getChouette1() == action.getChouette2() && action.getChouette2() != action.getCul()) {
+                                                                                        out.println("<p>Résultat: Chouette</p>");
+                                                                                        out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + Math.pow(action.getChouette1(), 2) + " points</p>");
+                                                                                    }
+                                                                                    else if(action.getChouette1() == action.getChouette2() && action.getChouette2() == action.getCul()) {
+                                                                                        out.println("<p>Résultat: Cul de chouette</p>");
+                                                                                        out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " a remporté: " + (40 + action.getChouette1() * 10) + " points</p>");
+                                                                                    }
+                                                                                    else if(action.getChouette1() == action.getChouette2() && action.getChouette1() + action.getChouette2() == action.getCul()) {
+                                                                                        out.println("<p>Résultat: Chouette velute</p>");
+                                                                                        if(action.getInterraction() != null) {
+                                                                                            out.println("<p>Le joueur " + action.getInterraction().getJoueurAffecte().getPseudonyme() + " a remporté: " + Math.pow(action.getCul(), 2) + " points</p>");
+                                                                                        }                                                                                            
+                                                                                    }
+                                                                                    else {
+                                                                                        int resultArray[] = {action.getChouette1(), action.getChouette2(), action.getCul()};
+                                                                                        Arrays.sort(resultArray);
+
+                                                                                        if(resultArray[0] + 1 == resultArray[1] && resultArray[1] + 1 == resultArray[2]) {
+                                                                                            out.println("<p>Résultat: Suite</p>");
+                                                                                            if(action.getInterraction() != null) {
+                                                                                                out.println("<p>Le joueur " + action.getInterraction().getJoueurAffecte().getPseudonyme() + " a perdu: 10 points</p>");
+                                                                                            }
                                                                                         }
                                                                                         else {
-                                                                                            int resultArray[] = {action.getChouette1(), action.getChouette2(), action.getCul()};
-                                                                                            Arrays.sort(resultArray);
-
-                                                                                            if(resultArray[0] + 1 == resultArray[1] && resultArray[1] + 1 == resultArray[2]) {
-                                                                                                out.println("<p>Résultat: Suite</p>");
-                                                                                                out.println("<p>Le joueur " + interact.getJoueurAffecte().getPseudonyme() + " a perdu: 10 points</p>");
-                                                                                            }
-                                                                                            else {
-                                                                                                out.println("<p>Résultat: Néant</p>");
-                                                                                                out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " n'a rien gagné</p>");
-                                                                                            }
+                                                                                            out.println("<p>Résultat: Néant</p>");
+                                                                                            out.println("<p>Le joueur " + action.getJoueurCourant().getPseudonyme() + " n'a rien gagné</p>");
                                                                                         }
                                                                                     }
                                                                                 %>

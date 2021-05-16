@@ -7,11 +7,19 @@
 const servletUrl = "ConnectionServlet";
 const redirectionUrl = "gameMenu.jsp?pseudo=";
 
+const pseudonymeElement = document.getElementById('pseudonyme');
+const motDePasseElement = document.getElementById("motDePasse");
+const submitButton = document.getElementById('butonas');
+
 function submitForm(event) {
     event.preventDefault(); 
     
-    let pseudonyme = document.getElementById('pseudonyme').value;
-    let motDePasse = document.getElementById("motDePasse").value;
+    pseudonymeElement.disabled = true;
+    motDePasseElement.disabled = true;
+    submitButton.disabled = true;
+    
+    let pseudonyme = pseudonymeElement.value;
+    let motDePasse = motDePasseElement.value;
     
     let infosJoueur = {pseudonyme, motDePasse};
     
@@ -26,6 +34,8 @@ function submitForm(event) {
     requete.open("POST", servletUrl);
     requete.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     requete.send(urlEncodedDataPairs.join('&'));
+    
+    
 }
 
 function majPage () {
@@ -44,6 +54,10 @@ function majPage () {
                 }
             });
         } else {
+            pseudonymeElement.disabled = false;
+            motDePasseElement.disabled = false;
+            submitButton.disabled = false;
+            
             iziToast.error({
             title: 'Oops !',
             message: 'Vos identifiants sont incorrects.',
