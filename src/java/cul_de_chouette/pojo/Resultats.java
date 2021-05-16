@@ -39,11 +39,11 @@ public class Resultats implements Serializable {
     private Integer ordre;
     @Basic(optional = false)
     @Column(name = "score")
-    private int score;
+    private int score = 0;
     @Column(name = "suites_gagnees")
-    private Integer suitesGagnees;
+    private Integer suitesGagnees = 0;
     @Column(name = "chouettes_velues_perdues")
-    private Integer chouettesVeluesPerdues;
+    private Integer chouettesVeluesPerdues = 0;
     @JoinColumn(name = "pseudonyme", referencedColumnName = "pseudonyme", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Joueur joueur;

@@ -56,7 +56,7 @@
 
                     <div class="d-flex justify-content-start" id="controls">
                         <button class="btn btn-light butonas" type="button" id="actionLancerDes" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px;" disabled>Lancer les dés</button>
-                        <button class="btn btn-light butonas" type="button" id="actionCrier" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px;" disabled>Crier</button>
+                        <button class="btn btn-light butonas" type="button" id="actionCrier" style="width: 20%; height: 40%; margin-bottom: 10px; margin-right: 10px;  background-color: rgb(221,172,24); color: rgb(255,255,255); font-size: 17px; display: none" disabled>Crier</button>
                     </div>
 
                 </div>

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,8 @@ public class Game {
     private Collection<Action> actions;
     private Collection<Resultats> resultats;
     private double pendingPoints;
+    private String pendingInteract = null;
+    private HashSet<String> arrivalOrder = new HashSet<>();
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.optString("id");
@@ -134,7 +137,7 @@ public class Game {
         this.nextTurn();
     }
     
-    public void endGame() {
+    public void endGame(Joueur gagnant) {
         // Faudra créer les resultats
         // Pour obtenir le nombre de chouette velu perdu il faut juste regarder dans les actions les effets négatif et compter le nombre d'apparition du joueur
         // Pour les suites c'est la même chose mais en comptant les effets positifs
@@ -161,6 +164,8 @@ public class Game {
     
     public void executeTurn() {
         this.pendingPoints = 0;
+        this.pendingInteract = null;
+        this.arrivalOrder.clear();
         JSONObject dice = new JSONObject();
         
         JSONArray chouette = new JSONArray(new Integer[]{Game.roll(), Game.roll()});
@@ -220,6 +225,7 @@ public class Game {
             result.put("action", "Chouette velute");
             result.put("interact", "Pas mou le caillou !");
             this.pendingPoints = Math.pow(cul, 2);
+            this.pendingInteract = "Chouette velute";
         }
         else {
             int resultArray[] = {chouette1, chouette2, cul};
@@ -229,6 +235,7 @@ public class Game {
                 result.put("action", "Suite");
                 result.put("interact", "Grelotte ça picote !");
                 this.pendingPoints = -10;
+                this.pendingInteract = "Suite";
             }
             
             result.put("points", 0);
@@ -236,15 +243,24 @@ public class Game {
         
         if(!result.has("interact")) {
             Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(dice.getString("pseudo"))).findFirst().get();
+            resultatInCollection.setScore(resultatInCollection.getScore() + result.getInt("points"));
+            result.put("points", resultatInCollection.getScore());
+            
+            if(!this.isOver()) this.nextTurn();
         }
         
         this.actions.add(action);
         
         this.broadcast(WSGame.createMessage(result, "RESULT"), new String[0]);
+        
+        this.isOver();
     }
     
-    public void handleInteraction(String joueur, String interaction) {
+    public void handleInteraction(String joueur) {
         // Gérer l'ordre d'arrivé et agir en conséquence
+        this.arrivalOrder.add(joueur);
+        
+        if(this.arrivalOrder.size() < this.users.size()) return;
         
         // TODO: Construire l'interraction
         Interraction interraction = new Interraction();
@@ -253,11 +269,50 @@ public class Game {
         interractionPK.setIdPartie(this.partie.getIdPartie());
         interractionPK.setTour(this.turn);
         
-        interraction.setEffet('P'); // Ou 'N' pour négatif
         interraction.setInterractionPK(interractionPK);
-        // interraction.setJoueurAffecte(joueurAffecte);
+        
+        Joueur joueurAffecte;
+        
+        if(this.pendingInteract.equals("Suite")) {
+            interraction.setEffet('N'); // Ou 'P' pour positif
+            joueurAffecte = em.find(Joueur.class, this.arrivalOrder.toArray(new String[0])[this.arrivalOrder.size() - 1]);
+        }
+        else {
+            interraction.setEffet('P');
+            joueurAffecte = em.find(Joueur.class, this.arrivalOrder.toArray(new String[0])[0]);
+        }
+        
+        if(joueurAffecte == null) {
+            this.broadcast(WSGame.createMessage("Error lors de l'intéraction !", "error"), new String[0]);
+            return;
+        }
+        
+        interraction.setJoueurAffecte(joueurAffecte);
+        
+        Resultats resultatInCollection = this.resultats.stream().filter(resultat -> resultat.getJoueur().getPseudonyme().equals(joueurAffecte.getPseudonyme())).findFirst().get();
+        resultatInCollection.setScore(resultatInCollection.getScore() + (int) this.pendingPoints);
+        
+        JSONObject interactObject = new JSONObject();
+        interactObject.put("pseudo", joueurAffecte.getPseudonyme());
+        interactObject.put("position", this.getPosForUser(joueurAffecte.getPseudonyme()));
+        interactObject.put("points", resultatInCollection.getScore());
+        
+        this.broadcast(WSGame.createMessage(this.getPosForUser(joueurAffecte.getPseudonyme()), "INTERACT"), new String[0]);
+        
         // Ajout de l'interraction à la dernière actions enregistré dans la partie
         this.actions.toArray(new Action[0])[this.actions.size() - 1].setInterraction(interraction);
+        
+        if(!this.isOver()) this.nextTurn();
+    }
+    
+    public boolean isOver() {
+        Joueur gagnant = this.resultats.stream().filter(result -> (result.getScore() >= this.reachPoint)).findFirst().get().getJoueur();
+        if(gagnant != null) {
+            this.endGame(gagnant);
+            return true;
+        }
+        
+        return false;
     }
     
     public void addUser(Session session) throws GameException {

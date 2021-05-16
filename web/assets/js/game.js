@@ -31,10 +31,11 @@
     let currentUsers = [];
     const playerPseudo = urlParams.get('pseudo');
     
+    let myTurn = false;
+    
     // Boutons
     const lancerDesButton = document.querySelector('#lancerDes');
-    const suiteButton = document.querySelector('#suite');
-    const chouetteVelueButton = document.querySelector('#chouetteVelue');
+    const crierButton = document.querySelector('#actionCrier');
     
     // Liste des joueurs
     const documentList = document.querySelector('#onlinePlayersContainer .list');
@@ -75,6 +76,7 @@
             else if('TURN' in data) playerTurn(data['TURN']);
             else if('ROLL' in data) showDice(data['ROLL']);
             else if('RESULT' in data) processResults(data['RESULT']);
+            else if('INTERACT' in data) processInteract(data['INTERACT']);
         }
     };
 
@@ -151,6 +153,9 @@
 
         users.forEach(user => {
             const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.classList.add('score');
+            span.innerHTML = 0;
             li.innerHTML = user;
             li.classList.add(user === 'En attente' ? 'disconnected' : 'connected');
             documentList.appendChild(li);
@@ -202,8 +207,16 @@
     }
     
     function playerTurn(player) {
-        if(player === playerPseudo) createAction(`C'est à vous de jouer !`, 'color: orange');
-        else createAction(`${player} est en train de jouer !`);
+        if(player === playerPseudo) {
+            createAction(`C'est à vous de jouer !`, 'color: orange');
+            lancerDesButton.disabled = false;
+            myTurn = true;
+        }
+        else {
+            createAction(`${player} est en train de jouer !`);
+            lancerDesButton.disabled = true;
+            myTurn = false;
+        }
         
         documentList.querySelectorAll('li').forEach(element => {
             element.classList.remove('actualTurn');            
@@ -214,7 +227,7 @@
     }
     
     lancerDesButton.addEventListener('click', (event) => {
-        websocket.send('ROLL');
+        if(myTurn) websocket.send('ROLL');
     });
     
     function showDice(results) {
@@ -227,10 +240,26 @@
         let score = documentList.querySelector(`li:nth-of-type(${results.position}) span.score`);
         if('interact' in results) {
             // Il y a interraction entre joueur
+            crierButton.innerHTML = results.action;
+            crierButton.style.display = 'block';
+            crierButton.disabled = false;
         }
         else {
             // C'est sans intérraction
-            score.innerHTML = score.innerHTML.parseInt() + results.points;
+            score.innerHTML = results.points;
         }
+    }
+    
+    crierButton.addEventListener('click', (evt) => {
+        websocket.send('interact');
+        crierButton.disabled = true;
+        setTimeout(() => {
+            crierButton.style.display = 'none';
+        }, 2000);
+    });
+    
+    function processInteract(interraction) {
+        let score = documentList.querySelector(`li:nth-of-type(${interraction.position}) span.score`);
+        score.innerHTML = interraction.points;
     }
 })();

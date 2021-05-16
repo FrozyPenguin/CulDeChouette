@@ -44,6 +44,9 @@ public class WSGame {
             case "startCountdown":
                 WSGame.listeRoom.get(channel).broadcast("STARTCOUNTDOWN", new String[0]);
                 break;
+            case "interact":
+                WSGame.listeRoom.get(channel).handleInteraction(pseudo);
+                break;
             default:
                 break;
         }
