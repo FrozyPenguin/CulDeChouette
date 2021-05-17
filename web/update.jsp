@@ -71,7 +71,7 @@
                           </select>
                     </div>
                     <div class="form-group"><input class="form-control formum" type="text" id="ville" placeholder="Ville" value="<%=joueur.getVille()%>" required></div>
-                    <button class="btn btn-light butonas" style="width: 100%;height: 100%;margin-bottom: 10px;background-color: rgb(221,172,24);color: rgb(255,255,255);font-size: 17px;"
+                    <button class="btn btn-light butonas" style="width: 100%;height: 100%;margin-top: 10px; margin-bottom: 10px;background-color: rgb(221,172,24);color: rgb(255,255,255);font-size: 17px;"
                         type="submit">Modifier</button>
                     <a class="linkas" style="font-size: 17px;margin: auto;margin-left: 0;margin-right: 0;margin-bottom: 0;margin-top: 0;padding-left: 0;padding-right: 0;color: rgb(177,151,70);" href="javascript:history.back()">Annuler</a>
                 </form>
@@ -87,6 +87,6 @@
         %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/marcelodolza/iziToast@1.4/dist/js/iziToast.min.js"></script>
-        <script src="assets/js/update.js">
+        <script src="assets/js/update.js"></script>
     </body>
 </html>

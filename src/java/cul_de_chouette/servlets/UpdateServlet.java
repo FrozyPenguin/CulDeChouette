@@ -26,7 +26,7 @@ import org.json.JSONObject;
  *
  * @author frozy
  */
-@WebServlet(name = "updateServlet", urlPatterns = {"/updateServlet"})
+@WebServlet(name = "UpdateServlet", urlPatterns = {"/UpdateServlet"})
 public class UpdateServlet extends HttpServlet {
 
     /**
@@ -75,7 +75,7 @@ public class UpdateServlet extends HttpServlet {
             }
             
             String mail = request.getParameter("mail");
-            String mdp = request.getParameter("motDePasse") != null ? request.getParameter("motDePasse") : joueur.getMotDePasse();
+            String mdp = request.getParameter("motDePasse") != null && !"".equals(request.getParameter("motDePasse")) ? request.getParameter("motDePasse") : joueur.getMotDePasse();
             String naiss = request.getParameter("naiss");
             String sexe = request.getParameter("sexe");
             String ville = request.getParameter("ville");

@@ -3,8 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-const servletUrl = 'updateServlet';
+console.log('oui')
+const servletUrl = 'UpdateServlet';
 
 function submitForm(event) {
     event.preventDefault(); 
@@ -38,9 +38,10 @@ function submitForm(event) {
 
 function majPage() {
     if (requete.readyState === 4) {
+        console.log(requete.responseText);
         if (requete.status === 200) {
             console.log('Inscription prise en compte');
-            document.querySelector('errorBox').style.display = 'none';
+            document.querySelector('#errorBox').style.display = 'none';
             iziToast.success({
                 title: 'Success',
                 message: 'Utilisateur modifié avec succès !',
@@ -53,9 +54,9 @@ function majPage() {
         } 
         else 
         {
-            let response = json.parse(this.responseText);
+            let response = JSON.parse(this.responseText);
             console.log(`Erreur requête : ${requete.status}`);
-            const errorBox = document.querySelector('errorBox');
+            const errorBox = document.querySelector('#errorBox');
             errorBox.innerHTML = 'Modification échoué !';
             errorBox.style.display = 'block';
         }
