@@ -47,14 +47,20 @@ body {
 
 #update {
     position: absolute;
-    top: 20px;
+    top: 1em;
     right: 20px;
+}
+
+#deco {
+    position: absolute;
+    top: 1em;
+    left: 20px;
 }
 
 #stats {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 2.2em;
+    right: 20px;
 }
 
 .connected {

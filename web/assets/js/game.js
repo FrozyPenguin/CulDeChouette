@@ -86,7 +86,7 @@
             else if('RESULT' in data) processResults(data['RESULT']);
             else if('INTERACT' in data) processInteract(data['INTERACT']);
             else if('END' in data) processEnd(data['END']);
-            else if('ARRIVALINTERRACT' in data) printArrivalInterract(data('ARRIVALINTERRACT'));
+            else if('ARRIVALINTERRACT' in data) printArrivalInterract(data['ARRIVALINTERRACT']);
         }
     };
 
