@@ -38,7 +38,6 @@ function submitForm(event) {
 
 function majPage() {
     if (requete.readyState === 4) {
-        console.log(requete.responseText);
         if (requete.status === 200) {
             console.log('Inscription prise en compte');
             document.querySelector('#errorBox').style.display = 'none';
