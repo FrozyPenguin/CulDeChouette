@@ -1,0 +1,302 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: http://ecariou.perso.univ-pau.fr/cours/web/projet.html
+Subject: =?utf-8?Q?Projet=20D=C3=A9veloppement=20Web=20Avanc=C3=A9?=
+Date: Mon, 17 May 2021 15:57:55 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--naUetP1c61LLc2lL9DHB5BpzGEgrDa8tvKqKlqepp8----"
+
+
+------MultipartBoundary--naUetP1c61LLc2lL9DHB5BpzGEgrDa8tvKqKlqepp8----
+Content-Type: text/html
+Content-ID: <frame-33C73356AC1224150A6813C30E8FFD7E@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://ecariou.perso.univ-pau.fr/cours/web/projet.html
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html; charset=
+=3Dwindows-1252"><link rel=3D"stylesheet" type=3D"text/css" href=3D"cid:css=
+-2d83ca3c-a33b-47f2-a445-8d9f0357a6ca@mhtml.blink" />=20
+  <link rel=3D"stylesheet" href=3D"http://ecariou.perso.univ-pau.fr/style.c=
+ss" type=3D"text/css">
+  <title>Projet D=E9veloppement Web Avanc=E9</title>
+</head>
+<body>
+
+<h1>Projet D=E9veloppement Web Avanc=E9 - 2020/21</h1>
+
+<p>Ce projet a pour but d'impl=E9menter un jeu de d=E9, "le Cul de
+Chouette", bas=E9 sur la s=E9rie Kaamelott.</p>
+
+<h2>R=E8gles du jeu</h2>
+
+<h3>Principe g=E9n=E9ral</h3>
+
+<p>Le Cul de Chouette se joue avec 3 d=E9s =E0 6 faces et un maximum de 6
+joueurs. Le joueur gagnant est celui qui atteint ou d=E9passe le premier
+le score de 343. Chaque joueur joue =E0 tour de r=F4le et marque des
+points en fonction des combinaisons de son lancer de 3 d=E9s. Certaines
+combinaisons impliquent une interaction entre les joueurs qui
+d=E9terminera les points gagn=E9s ou perdus.</p>
+
+<p>Un joueur lance une partie en invitant un ou plusieurs autres
+joueurs et en pr=E9cisant l'ordre de jeu de chacun. C'est le joueur qui
+a lanc=E9 la partie qui commence =E0 jouer.</p>
+
+<h3>Combinaisons</h3>
+
+<p>Les d=E9s se lancent en 2 fois : d'abord 2 d=E9s puis le troisi=E8me. Le
+jet des 2 premiers d=E9s est appel=E9 la chouette et le troisi=E8me d=E9 es=
+t
+appel=E9 le cul.</p>
+
+<p>Les combinaisons sans interaction :</p>
+
+<ul>
+<li><b>La velute</b> : la somme des d=E9s de la chouette donne la valeur
+du cul. Exemple : (1,3) avec 4. Les points marqu=E9s par le joueur sont le
+carr=E9 de la velute. Dans l'exemple pr=E9c=E9dent, la velute est de 4, don=
+c
+16 points sont marqu=E9s.</li>
+
+<li><b>La chouette</b> : les deux d=E9s de la chouette sont
+identiques. Exemple : (5,5). Les points marqu=E9s sont le carr=E9 de
+cette valeur identique, soit 25 pour l'exemple.</li>
+
+<li><b>Le cul de chouette</b> : les trois d=E9s sont identiques. 50
+points sont marqu=E9s pour un cul de chouette de 1, 60 pour un de 2, 70
+pour un de 3, 80 pour un de 4, 90 pour un de 5 et 100 pour un de
+6.</li>
+
+</ul>
+
+<p>Les combinaisons avec interaction :</p>
+<ul>
+<li><b>La suite</b> : toute combinaison de 3 d=E9s donnant 3 valeurs
+cons=E9cutives (1,2,3), (3,4,5) ... En cas de suite, chaque joueur doit
+crier "Grelotte =E7a picote !". Le dernier joueur =E0 le faire perd 10
+points.
+</li>
+<li><b>La chouette velute</b> : il s'agit d'une chouette qui avec le
+cul donne une velute, ce qui est le cas pour les 3 combinaisons (1,1)
+avec 2, (2,2) avec 4 et (3,3) avec 6. Dans ce cas, chaque joueur doit
+crier "Pas mou le caillou !". Le premier =E0 crier gagne les points de
+la velute.</li>
+</ul>
+
+
+<h2>Fonctionnalit=E9s et interfaces</h2>
+
+<h3>Gestion des comptes joueur</h3>
+
+<p>Chaque joueur peut se cr=E9er un compte en pr=E9cisant ses informations
+personnelles : pseudo, mot de passe, age, sexe et ville. A l'exception
+du pseudo, les autres champs peuvent =EAtre modifi=E9s.</p>
+
+<h3>Interface de jeu</h3>
+
+<p>Chaque joueur se connecte avec son pseudo et mot de passe. La page
+affiche la liste des joueurs actuellement connect=E9s avec un
+rafraichissement r=E9gulier.</p>
+
+<p>Un joueur lance une partie en s=E9lectionnant un ou plusieurs joueurs
+dans la liste. S'il y en a plusieurs, il doit =EAtre possible de
+pr=E9ciser l'ordre des joueurs. Pour raccourcir les parties, il pourra
+aussi changer la valeur de 343 de fin de partie.</p>
+
+<p>Chaque joueur s=E9lectionn=E9 re=E7oit une invitation et l'accepte ou la
+refuse. Une fois que tout le monde a r=E9pondu, le jeu d=E9marre.</p>
+
+<p>Quand c'est =E0 son tour de jouer, un joueur lance les d=E9s en deux
+fois et marque des points comme pr=E9cis=E9 dans les r=E8gles.</p>
+
+<p>Quand ce n'est pas le tour d'un joueur, celui-ci voit sur sa page
+ce qu'il se passe chez celui qui joue.</p>
+
+<p>Les combinaisons avec interaction sont g=E9r=E9es par des boutons
+permettant d'envoyer le bon message.</p>
+
+<p>A chaque tour, tout le monde est inform=E9 de qui a marqu=E9 combien de
+points et les scores de chaque joueur sont visibles.</p>
+
+<h3>Statistiques</h3>
+
+<p>Un ensemble d'informations devront =EAtre disponibles :</p>
+<ul>
+<li>La liste des joueurs enregistr=E9s.</li>
+<li>Des informations sur chaque joueur : en plus des informations
+personnelles, on pr=E9cisera le nombre de parties jou=E9es, le nombre de
+victoires, le nombre moyen de victoires, le score moyen, la moyenne
+des suites gagn=E9es et des chouettes velues perdues.</li>
+<li>Le r=E9sultat de chaque partie pourra =EAtre consult=E9 : liste des
+joueurs avec leurs points, le nombre de suites gagn=E9es et de chouettes
+velues perdues. La liste des lanc=E9s de d=E9s avec les interactions
+effectu=E9es par chaque joueur sera enregistr=E9e pour chaque partie (ce
+qui permettra de resimuler le d=E9roulement de la partie).</li>
+</ul>
+
+<h2>Contraintes techniques</h2>
+
+<h3>Partie donn=E9es</h3>
+
+<p>Toutes les donn=E9es sur les joueurs et les parties seront stock=E9es
+dans une base de donn=E9es relationnelle dont l'acc=E8s se fera via le
+framework JPA. La couche d'acc=E8s aux donn=E9es doit =EAtre totalement
+d=E9coupl=E9e des couches m=E9tier et de g=E9n=E9ration/gestion des pages
+Web.</p>
+
+<h3>Partie Web</h3>
+
+<p>La partie Web prendra en charge la g=E9n=E9ration des interfaces du
+jeu. Les langages utilis=E9s pour les pages Web seront HTML5 et
+CSS3.</p>
+
+<p>Pour les interactions, les technologies utilis=E9es seront celles
+vues en cours : JSP, Javascript, AJAX... L'utilisation de frameworks
+n'est pas obligatoire mais pas interdite non plus.</p>
+
+<p>Il faut que les joueurs puissent cr=E9er leurs comptes se connecter =E0
+l'interface, cr=E9er, rejoindre et quitter des parties, il faut aussi
+g=E9rer les notifications =E0 tous les joueurs tout au long du d=E9roulemen=
+t
+des parties.</p>
+
+<h2>Rendu du travail</h2>
+
+<p>Le premier livrable contiendra uniquement la partie d'acc=E8s aux
+donn=E9es en JPA. Celle-ci ne devra pas =EAtre modifi=E9e dans la suite du
+projet, sauf =E0 la marge.</p>
+
+<p>Le second livrable contiendra l'application Web compl=E8te et
+fonctionnelle.</p>
+
+<p>Le travail est =E0 faire en bin=F4me.</p>
+
+
+
+
+</body></html>
+------MultipartBoundary--naUetP1c61LLc2lL9DHB5BpzGEgrDa8tvKqKlqepp8----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: cid:css-2d83ca3c-a33b-47f2-a445-8d9f0357a6ca@mhtml.blink
+
+@charset "windows-1252";
+
+@media print {
+  #ghostery-tracker-tally { display: none !important; }
+}
+------MultipartBoundary--naUetP1c61LLc2lL9DHB5BpzGEgrDa8tvKqKlqepp8----
+Content-Type: text/css
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://ecariou.perso.univ-pau.fr/style.css
+
+@charset "windows-1252";
+
+body, table { font-family: arial, sans-serif; font-size: 90%; background-co=
+lor: white; text-align: left; }
+
+body.bloc { background-color: rgb(238, 238, 238); }
+
+div.bloc { border: 2px solid rgb(187, 170, 255); border-radius: 6px; paddin=
+g: 4pt; margin: 12px; background-color: white; box-shadow: rgb(170, 170, 17=
+0) 6px 6px 6px; }
+
+div.bloc table { background-color: white; }
+
+code { font-size: 120%; }
+
+div#colonne { position: fixed; left: 0pt; width: 150pt; padding-left: 3pt; =
+}
+
+div#contenu { position: absolute; left: 155pt; }
+
+div#monNom { font-weight: bold; font-variant: small-caps; font-size: medium=
+; }
+
+a { text-decoration: none; color: rgb(51, 51, 255); }
+
+a:visited { color: rgb(170, 68, 170); }
+
+a:hover { text-decoration: none; color: white; background-color: rgb(119, 1=
+19, 255); }
+
+hr { size: 3px; }
+
+span.moi { font-weight: bold; }
+
+ul.listepubli { padding-left: 5mm; padding-top: 2mm; padding-bottom: 5mm; }
+
+ul.listepubli em { color: rgb(68, 68, 153); }
+
+h1, h2, h3, h4, h5 { font-variant: small-caps; font-family: arial; }
+
+h1 { border-style: solid; border-right-color: initial; border-left-color: i=
+nitial; border-image: initial; border-width: 1pt 0pt 3pt; border-top-color:=
+ rgb(153, 153, 255); border-bottom-color: rgb(153, 153, 255); padding-left:=
+ 2mm; font-size: large; background-image: linear-gradient(rgb(238, 238, 255=
+), rgb(153, 153, 255)); }
+
+h1.centre { text-align: center; padding: 0pt; }
+
+div.bloc h1 { margin: -4pt; border-top: 0pt; border-bottom-width: 2pt; }
+
+h2 { font-size: medium; border-bottom: 2pt solid rgb(187, 170, 255); }
+
+span.fichiers { }
+
+p.code { border: 2px dashed grey; padding: 5px; background-color: rgb(250, =
+255, 255); font-family: monospace; }
+
+p.warning { border: 2px dashed rgb(17, 17, 204); padding: 5px; background-c=
+olor: rgb(238, 238, 255); }
+
+a { text-decoration: none; }
+
+div:hover, td:hover, li:hover, p:hover { }
+
+#colonne a { text-decoration: none; }
+
+#colonne a:hover { text-decoration: none; }
+
+#colonne ul.menu { padding: 3pt; font-weight: bold; list-style-type: none; =
+}
+
+#colonne ul.menu li { border-bottom: 1pt dashed black; padding: 3pt; }
+
+#colonne ul.menu2 { margin: 0px; padding: 0px; list-style-type: none; }
+
+#colonne ul.sousmenu { list-style-type: square; padding-left: 15pt; }
+
+#colonne ul.sousmenu li { border: none; }
+
+_#colonne ul.sousmenu li::before { }
+
+#colonne ul.menu2 a { display: block; color: black; background-color: rgb(2=
+04, 204, 255); padding: 3pt; text-decoration: none; border-bottom: 1px soli=
+d rgb(255, 255, 255); font-weight: bold; }
+
+#colonne ul.menu2 a:hover { background-color: rgb(119, 119, 255); color: rg=
+b(255, 255, 240); }
+
+#colonne img { padding-bottom: 20pt; }
+
+#colonne a img { padding-bottom: 0pt; }
+
+div.annee { font-weight: bold; font-size: 120%; }
+
+span.resume { color: rgb(51, 51, 255); }
+
+span.resume:hover { background-color: rgb(119, 119, 255); color: white; }
+
+div.resume { font-size: 90%; background-color: rgb(238, 232, 238); color: b=
+lack; text-align: justify; width: 95%; padding: 0.2cm; margin-bottom: 1pt; =
+}
+
+div.bibtex { font-size: 90%; background-color: rgb(238, 238, 224); color: b=
+lack; text-align: justify; width: 95%; padding: 0.2cm; margin-bottom: 1pt; =
+}
+
+div.h2 { font-size: 150%; font-weight: bold; padding-top: 0.2cm; padding-bo=
+ttom: 0.5cm; }
+------MultipartBoundary--naUetP1c61LLc2lL9DHB5BpzGEgrDa8tvKqKlqepp8------
