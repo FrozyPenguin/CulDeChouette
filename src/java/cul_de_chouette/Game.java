@@ -267,6 +267,10 @@ public class Game {
     public void handleInteraction(String joueur) {
         // Gérer l'ordre d'arrivé et agir en conséquence
         this.arrivalOrder.add(joueur);
+        JSONObject order = new JSONObject();
+        order.put("order", this.arrivalOrder.size());
+        order.put("pseudo", joueur);
+        this.broadcast(WSGame.createMessage(order, "ARRIVALINTERRACT"), new String[0]);
         
         if(this.arrivalOrder.size() < this.users.size()) return;
         

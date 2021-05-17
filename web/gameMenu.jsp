@@ -27,7 +27,8 @@
         }
         else {
     %>
-    <a class="linkas" href="update.jsp?pseudo=<%= pseudo %>" id="update">Mettre à jour ses informations</a>
+        <a class="linkas" href="update.jsp?pseudo=<%= pseudo %>" id="update">Mettre à jour ses informations</a>
+        <a class="linkas" href="statistiques.jsp" id="stats">Accèder aux statistiques</a>
         <h1 class="text-center">Avec qui voulez-vous jouer ?</h1>
         <div class="table-responsive">
             <table class="table table-striped table-hover table-bordered table-responsive table-dark">

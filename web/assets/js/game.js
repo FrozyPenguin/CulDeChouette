@@ -86,6 +86,7 @@
             else if('RESULT' in data) processResults(data['RESULT']);
             else if('INTERACT' in data) processInteract(data['INTERACT']);
             else if('END' in data) processEnd(data['END']);
+            else if('ARRIVALINTERRACT' in data) printArrivalInterract(data('ARRIVALINTERRACT'));
         }
     };
 
@@ -314,5 +315,10 @@
                 window.location.replace(`gameMenu.jsp?pseudo=${playerPseudo}`);
                 }
             });
+    }
+    
+    function printArrivalInterract(joueur) {
+        if(joueur.pseudo === playerPseudo) createAction(`${joueur.order} - ${joueur.pseudo} Vous avez répondu à l'intérraction !`, 'color: orange');
+        else createAction(`${joueur.order} - ${joueur.pseudo} a répondu à l'intérraction !`);
     }
 })();

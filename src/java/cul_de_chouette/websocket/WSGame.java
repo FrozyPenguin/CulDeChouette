@@ -103,9 +103,11 @@ public class WSGame {
                 Game game = WSGame.listeRoom.get(id);
                 game.addUser(session);
                 game.sendToUser(pseudo, WSGame.createMessage(game.getReachPoint(), "REACH"));
-            } catch (GameException|NullPointerException ex) {
+            } catch (GameException ex) {
                 System.out.println(ex);
                 session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Vous n'êtes pas autorisé à rejoindre la partie !"));
+            } catch (NullPointerException ex) {
+                session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "La partie n'éxiste pas !"));
             }
         }
     }
