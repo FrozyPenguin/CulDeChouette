@@ -261,14 +261,14 @@
         let score = documentList.querySelector(`li:nth-of-type(${results.position}) span.score`);
         if('interact' in results) {
             // Il y a interraction entre joueur
-            crierButton.innerHTML = results.action;
+            crierButton.innerHTML = results.interact;
             crierButton.style.display = 'block';
             crierButton.disabled = false;
             if(results.pseudo === playerPseudo) createAction(`Vous avez effectué un(e) ${results.action} ! Cliquez vite pour remporter !`, 'color: orange');
             else createAction(`${results.pseudo} a effectué un(e) ${results.action} ! Cliquez vite pour remporter !`);
         }
         else {
-            // C'est sans intérraction
+            // C'est sans interraction
             
             if(results.pseudo === playerPseudo) {
                 createAction(`Vous avez effectué  un(e) ${results.action} !` , 'color: orange');
@@ -286,9 +286,7 @@
     crierButton.addEventListener('click', (evt) => {
         websocket.send('interact');
         crierButton.disabled = true;
-        setTimeout(() => {
-            crierButton.style.display = 'none';
-        }, 2000);
+        crierButton.style.display = 'none';
     });
     
     function processInteract(interraction) {
@@ -318,7 +316,7 @@
     }
     
     function printArrivalInterract(joueur) {
-        if(joueur.pseudo === playerPseudo) createAction(`${joueur.order} - ${joueur.pseudo} Vous avez répondu à l'intérraction !`, 'color: orange');
-        else createAction(`${joueur.order} - ${joueur.pseudo} a répondu à l'intérraction !`);
+        if(joueur.pseudo === playerPseudo) createAction(`${joueur.order} - ${joueur.pseudo} Vous avez répondu à l'interraction !`, 'color: orange');
+        else createAction(`${joueur.order} - ${joueur.pseudo} a répondu à l'interraction !`);
     }
 })();
