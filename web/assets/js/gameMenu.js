@@ -206,4 +206,37 @@ import { Message } from './Message.js';
         // Rediriger vers la bonne page
         window.location.href = url;
     }
+    
+    document.querySelector('#deco').addEventListener('click', (event) => {
+        event.preventDefault();
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "DisconnectServlet");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    iziToast.success({
+                    title: 'Déconnecté !',
+                    message: 'Vous allez être redirigé.',
+                    position: 'center',
+                    transitionIn: 'fadeIn',
+                    timeout: 1000,
+                    pauseOnHover: false,
+                    onClosing: (instance, toast, closedBy) => {
+                            window.location.replace('index.html');
+                        }
+                    });
+                } else {
+                    iziToast.error({
+                    title: 'Oops !',
+                    message: 'Déconnection échoué.',
+                    position: 'center',
+                    transitionIn: 'fadeIn',
+                    pauseOnHover: false
+                    });
+                }
+            } 
+        }
+        xhr.send(document.querySelector('#deco').href);
+    });
 })();

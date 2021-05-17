@@ -21,7 +21,6 @@
     %>
         <div class="alert alert-danger m-0" role="alert" id="alert">
             Vous n'êtes pas connecté !
-            <%= pseudo + "      " + pseudoReq %>
         </div>
     <%
         }
