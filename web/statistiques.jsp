@@ -71,13 +71,13 @@
                                         <p>Ville: <%= joueur.getVille() %></p>
                                         <p>Partie(s) jouée(s): <%= joueur.getNbPartiesJouee() %></p>
                                         <p>Partie(s) gagnée(s): <%= joueur.getNbPartiesGagnee() %></p>
-                                        <p>Chouette velute perdu: <%= joueur.getMoyChouetteVeluesPerdu() %></p>
+                                        <p>Chouette(s) velute(s) perdue(s): <%= joueur.getMoyChouetteVeluesPerdu() %></p>
                                         <p>Suite(s) gagnée(s): <%= joueur.getMoySuiteGagnee() %></p>
                                         <p>Score moyen: <%= joueur.getMoyScore() %></p>
                                         <%
                                             if(!joueur.getResultatsCollection().isEmpty()) {
                                         %>
-                                            <p>Parties joué par l'utilisateur :</p>
+                                            <p>Parties jouées par l'utilisateur :</p>
                                             <div class="accordion bg-dark" id="accordionPartie-<%= joueur.getPseudonyme() %>">
                                             <%
                                                 Collection<Resultats> results = joueur.getResultatsCollection();

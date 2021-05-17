@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import javax.persistence.EntityManager;
@@ -51,7 +50,7 @@ public class Game {
     private final Collection<Resultats> resultats = new ArrayList<>();
     private double pendingPoints;
     private String pendingInteract = null;
-    private final HashSet<String> arrivalOrder = new HashSet<>();
+    private final ArrayList<String> arrivalOrder = new ArrayList<>();
     
     public Game(JSONObject gameInfo) throws GameException {
         this.id = gameInfo.optString("id");
@@ -155,6 +154,7 @@ public class Game {
         this.partie.setVainqueur(gagnant);
         this.partie.setActionCollection(this.actions);
         this.partie.setResultatsCollection(this.resultats);
+        this.em.flush();
         this.trans.commit();
     }
     
