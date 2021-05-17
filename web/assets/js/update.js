@@ -47,7 +47,7 @@ function majPage() {
                 position: 'bottomRight',
                 transitionIn: 'bounceInLeft',
                 onClosed: function(instance, toast, closedBy){
-                    window.location.href = 'gameMenu.jsp';
+                    window.history.back();
                 }
             });
         } 

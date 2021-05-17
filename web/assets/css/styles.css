@@ -83,7 +83,7 @@ body {
 }
 
 .connected::after {
-    content: url('data:image/svg+xml;utf8,<svg fill="none" stroke="green" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>');
+    content: url('data:image/svg+xml;utf8,<svg fill="none" stroke="orange" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" /></svg>');
     position: absolute;
     height: 1em;
     width: 1em;

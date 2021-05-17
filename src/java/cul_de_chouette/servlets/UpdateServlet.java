@@ -75,7 +75,7 @@ public class UpdateServlet extends HttpServlet {
             }
             
             String mail = request.getParameter("mail");
-            String mdp = request.getParameter("motDePasse");
+            String mdp = request.getParameter("motDePasse") != null ? request.getParameter("motDePasse") : joueur.getMotDePasse();
             String naiss = request.getParameter("naiss");
             String sexe = request.getParameter("sexe");
             String ville = request.getParameter("ville");
@@ -100,7 +100,7 @@ public class UpdateServlet extends HttpServlet {
                 joueur.setVille(ville);
                 joueur.setSexe(sexe);
                 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
                 //convert String to LocalDate
                 LocalDate dateNaiss = LocalDate.parse(naiss, formatter);
